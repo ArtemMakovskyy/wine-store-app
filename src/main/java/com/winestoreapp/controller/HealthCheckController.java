@@ -1,9 +1,7 @@
 package com.winestoreapp.controller;
 
-import com.winestoreapp.model.Role;
-import com.winestoreapp.repository.RoleRepository;
+import com.winestoreapp.repository.UserRepository;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -17,12 +15,11 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Health check management",
         description = "Endpoint health check controller")
 public class HealthCheckController {
-    private final RoleRepository roleRepository;
+    private final UserRepository userRepository;
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> healthCheck() {
-        final List<Role> all = roleRepository.findAll();
-        System.out.println(all.isEmpty());
+        System.out.println(userRepository.count());
         return ResponseEntity.ok("Health check passed. "
                 + "Application is running smoothly.");
     }
