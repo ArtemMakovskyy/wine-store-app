@@ -2,7 +2,6 @@ package com.winestoreapp.dto.mapper;
 
 import com.winestoreapp.config.MapperConfig;
 import com.winestoreapp.dto.user.UserResponseDto;
-import com.winestoreapp.dto.user.UserResponseWithChatIdDto;
 import com.winestoreapp.model.Role;
 import com.winestoreapp.model.User;
 import java.util.Set;
@@ -16,8 +15,6 @@ import org.mapstruct.ReportingPolicy;
 public interface UserMapper {
 
     UserResponseDto toDto(User user);
-
-    UserResponseWithChatIdDto toDtoWithChatId(User user);
 
     default Set<String> mapRoles(Set<Role> roles) {
         return roles.stream()

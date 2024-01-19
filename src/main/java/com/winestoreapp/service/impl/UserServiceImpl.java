@@ -3,17 +3,14 @@ package com.winestoreapp.service.impl;
 import com.winestoreapp.dto.mapper.UserMapper;
 import com.winestoreapp.dto.user.UserRegistrationRequestDto;
 import com.winestoreapp.dto.user.UserResponseDto;
-import com.winestoreapp.exception.EntityNotFoundException;
 import com.winestoreapp.exception.RegistrationException;
 import com.winestoreapp.model.Role;
-import com.winestoreapp.model.RoleName;
 import com.winestoreapp.model.User;
 import com.winestoreapp.repository.RoleRepository;
 import com.winestoreapp.repository.UserRepository;
 import com.winestoreapp.service.UserService;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -24,33 +21,6 @@ public class UserServiceImpl implements UserService {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
-
-    @Override
-    public UserResponseDto updateRole(Long userId, String role) {
-        final User userFromDb = userRepository.findById(userId).orElseThrow(
-                () -> new EntityNotFoundException("Can't find user by id " + userId));
-        final Role roleFromDb = roleRepository.findByName(RoleName.valueOf(role)).orElseThrow(
-                () -> new EntityNotFoundException("Can't find role " + role));
-        userFromDb.setRoles(Set.of(roleFromDb));
-        return userMapper.toDto(userRepository.save(userFromDb));
-    }
-
-    @Override
-    public UserResponseDto updateInfo(
-            Authentication authentication, UserRegistrationRequestDto requestDto) {
-        final User userFromAuthentication = (User) authentication.getPrincipal();
-        userFromAuthentication.setEmail(requestDto.getEmail());
-        userFromAuthentication.setFirstName(requestDto.getFirstName());
-        userFromAuthentication.setLastName(requestDto.getLastName());
-        userFromAuthentication.setPassword(requestDto.getPassword());
-        return userMapper.toDto(userRepository.save(userFromAuthentication));
-    }
-
-    @Override
-    public UserResponseDto getUserFromAuthentication(Authentication authentication) {
-        final User principal = (User) authentication.getPrincipal();
-        return userMapper.toDto(principal);
-    }
 
     @Override
     public UserResponseDto register(UserRegistrationRequestDto request)

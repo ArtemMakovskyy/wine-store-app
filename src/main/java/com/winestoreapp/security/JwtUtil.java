@@ -8,6 +8,8 @@ import io.jsonwebtoken.security.Keys;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.function.Function;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -17,9 +19,18 @@ public class JwtUtil {
     private Key secret;
     @Value("${jwt.expiration:1000}")
     private long expiration;
+    private Set<String> blacklistedTokens = new HashSet<>();
 
     public JwtUtil(@Value("${jwt.secret}") String secretString) {
         secret = Keys.hmacShaKeyFor(secretString.getBytes(StandardCharsets.UTF_8));
+    }
+
+    public void invalidateToken(String token) {
+        blacklistedTokens.add(token);
+    }
+
+    public boolean isBlacklistedToken(String token) {
+        return blacklistedTokens.contains(token);
     }
 
     public String generateToken(String username) {
@@ -33,6 +44,9 @@ public class JwtUtil {
 
     public boolean isValidToken(String token) {
         try {
+            if (isBlacklistedToken(token)) {
+                return false;
+            }
             Jws<Claims> claimsJws = Jwts.parserBuilder()
                     .setSigningKey(secret)
                     .build()

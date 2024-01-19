@@ -9,8 +9,10 @@ import com.winestoreapp.security.AuthenticationService;
 import com.winestoreapp.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,5 +40,13 @@ public class AuthenticationController {
     @PostMapping("/login")
     public UserLoginResponseDto loginUser(@RequestBody @Valid UserLoginRequestDto requestDto) {
         return authenticationService.authenticate(requestDto);
+    }
+
+    @Operation(summary = "Logout user.",
+            description = "Logout user. Disable current token")
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(HttpServletRequest httpRequest) {
+        authenticationService.logout(httpRequest);
+        return ResponseEntity.ok("Logout successful");
     }
 }
