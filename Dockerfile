@@ -21,7 +21,12 @@ COPY --from=builder application/spring-boot-loader/ ./
 COPY --from=builder application/snapshot-dependencies/ ./
 COPY --from=builder application/application/ ./
 ENTRYPOINT ["java", "org.springframework.boot.loader.launch.JarLauncher"]
+#ENV DOCKER_ENV=false
+#ENTRYPOINT ["sh", "-c", "if [ \"$DOCKER_ENV\" = \"true\" ]; then java org.springframework.boot.loader.launch.JarLauncher; else echo \"Container is not set to start automatically.\"; fi"]
 EXPOSE 8080
+
+
+
 
 ##---------------------
 ## Соберите приложение (убедитесь, что у вас установлен Apache Maven)
