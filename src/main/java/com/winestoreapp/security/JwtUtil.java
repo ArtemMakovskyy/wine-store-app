@@ -7,30 +7,30 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
+import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 @Component
 public class JwtUtil {
+    private static final Long MILLISECONDS_IN_DAY = 8_6400_000L;
+    private static final Map<String, LocalDateTime> INVALID_TOKENS = new ConcurrentHashMap<>();
+    private static final String EVERY_DAY_AT_MIDNIGHT = "0 0 0 * * *";
     private Key secret;
     @Value("${jwt.expiration:1000}")
     private long expiration;
-    private Set<String> blacklistedTokens = new HashSet<>();
 
     public JwtUtil(@Value("${jwt.secret}") String secretString) {
         secret = Keys.hmacShaKeyFor(secretString.getBytes(StandardCharsets.UTF_8));
     }
 
-    public void invalidateToken(String token) {
-        blacklistedTokens.add(token);
-    }
-
-    public boolean isBlacklistedToken(String token) {
-        return blacklistedTokens.contains(token);
+    public void addToInvalidTokens(String token) {
+        INVALID_TOKENS.put(token, LocalDateTime.now());
     }
 
     public String generateToken(String username) {
@@ -44,7 +44,7 @@ public class JwtUtil {
 
     public boolean isValidToken(String token) {
         try {
-            if (isBlacklistedToken(token)) {
+            if (INVALID_TOKENS.containsKey(token)) {
                 return false;
             }
             Jws<Claims> claimsJws = Jwts.parserBuilder()
@@ -59,6 +59,18 @@ public class JwtUtil {
 
     public String getUsername(String token) {
         return getClaimFromToken(token, Claims::getSubject);
+    }
+
+    @Scheduled(cron = EVERY_DAY_AT_MIDNIGHT)
+    private void deleteAllExpiredTokensBySchedule() {
+        int daysQuantityForDeletingExpiredTokens
+                = (int) Math.ceil((double) expiration / MILLISECONDS_IN_DAY);
+
+        LocalDateTime dayAfterWhichExpiredTokensMustBeDeleted =
+                LocalDateTime.now().minusDays(daysQuantityForDeletingExpiredTokens);
+
+        INVALID_TOKENS.entrySet().removeIf(entry
+                -> entry.getValue().isAfter(dayAfterWhichExpiredTokensMustBeDeleted));
     }
 
     private <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) {

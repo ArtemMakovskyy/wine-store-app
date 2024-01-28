@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h2>Health Check</h2>
+
+<button onclick="healthCheck()">Check Health</button>
+
+<p id="demo"></p>
+
+<script>
+    function healthCheck() {
+        window.open('http://localhost:8080/api/health', '_blank');
+    }
+</script>
+
+</body>
+</html>

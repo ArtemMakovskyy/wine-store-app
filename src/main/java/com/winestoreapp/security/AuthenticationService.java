@@ -26,7 +26,7 @@ public class AuthenticationService {
     public void logout(HttpServletRequest httpRequest) {
         String token = jwtAuthenticationFilter.getToken(httpRequest);
         if (token != null) {
-            jwtUtil.invalidateToken(token);
+            jwtUtil.addToInvalidTokens(token);
         }
     }
 }
