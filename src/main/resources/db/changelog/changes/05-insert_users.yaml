@@ -1,0 +1,71 @@
+databaseChangeLog:
+  - changeSet:
+      id: insert-user-admin
+      author: artemmakovskyy
+      changes:
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: email
+                  value: "admin12345@gmail.com"
+              - column:
+                  name: first_name
+                  value: "Admin"
+              - column:
+                  name: last_name
+                  value: "Administrator"
+              - column:
+                  name: password
+                  value: "$2a$10$YXWuaxop./1Z5qCzGMtnkOsXaPhX1NAwnGb1MFsQNHZyLWR6ypAUy"
+              - column:
+                  name: is_deleted
+                  valueBoolean: false
+  - changeSet:
+      id: insert-user_roles-admin
+      author: artemmakovskyy
+      changes:
+        - insert:
+            tableName: users_roles
+            columns:
+              - column:
+                  name: user_id
+                  valueNumeric: 1
+              - column:
+                  name: role_id
+                  valueNumeric: 1
+  - changeSet:
+      id: insert-user-manager
+      author: artemmakovskyy
+      changes:
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: email
+                  value: "manager12345@gmail.com"
+              - column:
+                  name: first_name
+                  value: "Manag"
+              - column:
+                  name: last_name
+                  value: "Manager"
+              - column:
+                  name: password
+                  value: "$2a$10$SYOJnUyUPRRtZq5vwVseuOr9gPDBG3gJE8NDw2aHKacC/jiUIhiWK"
+              - column:
+                  name: is_deleted
+                  valueBoolean: false
+  - changeSet:
+      id: insert-user_roles-manager
+      author: artemmakovskyy
+      changes:
+        - insert:
+            tableName: users_roles
+            columns:
+              - column:
+                  name: user_id
+                  valueNumeric: 2
+              - column:
+                  name: role_id
+                  valueNumeric: 2

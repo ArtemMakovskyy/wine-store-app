@@ -63,6 +63,7 @@ public class JwtUtil {
 
     @Scheduled(cron = EVERY_DAY_AT_MIDNIGHT)
     private void deleteAllExpiredTokensBySchedule() {
+        // TODO: 30.01.2024 check tokens
         int daysQuantityForDeletingExpiredTokens
                 = (int) Math.ceil((double) expiration / MILLISECONDS_IN_DAY);
 

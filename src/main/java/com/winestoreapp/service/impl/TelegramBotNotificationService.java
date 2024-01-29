@@ -57,7 +57,7 @@ public class TelegramBotNotificationService
                 }
                 case "/contacts", "Contacts" -> executingTheContactsCommand(
                         userChatId, update.getMessage().getChat().getFirstName());
-                case "/wine_selection", "Select wine color"
+                case "/wine_selection", "Select wine by color"
                         -> executingTheWineColorSelectionCommand(userChatId);
                 case "/help", "Help" -> executingHelpCommand(userChatId);
                 case "/red_wine", "Red wine" -> executingRedWineCommand(userChatId);
@@ -135,7 +135,7 @@ public class TelegramBotNotificationService
         firstRow.add("Contacts");
         firstRow.add("Main menu");
         KeyboardRow secondRow = new KeyboardRow();
-        secondRow.add("Select wine color");
+        secondRow.add("Select wine by color");
         secondRow.add("Help");
 
         List<KeyboardRow> keyboardRows = new ArrayList<>();
@@ -212,7 +212,7 @@ public class TelegramBotNotificationService
 
     private ReplyKeyboardMarkup getRegisterButtons() {
         KeyboardRow loginLineButtons = new KeyboardRow();
-        loginLineButtons.add("Select wine");
+        loginLineButtons.add("Select wine by color");
         loginLineButtons.add("Main menu");
         loginLineButtons.add("Help");
 
@@ -228,16 +228,17 @@ public class TelegramBotNotificationService
 
     private void sendPicture(Long chatId) {
         try {
-            // Загрузка изображения
-            InputFile avatar = new InputFile(new File(
-                    "src/main/resources/static/wine_avatar.jpg"), "image.jpg");
+            InputFile avatar = new InputFile(
+                    new File(
+                            "src/main/resources/static/wine_avatar.jpg"),
+                    "image.jpg");
             SendPhoto msg = new SendPhoto();
             msg.setChatId(chatId.toString());
             msg.setPhoto(avatar);
 
             execute(msg);
         } catch (Exception e) {
-            log.error("Ошибка при отправке аватара", e);
+            log.error("Error sending pictures", e);
         }
     }
 }

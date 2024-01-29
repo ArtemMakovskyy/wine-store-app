@@ -46,6 +46,7 @@ public class AuthenticationController {
             description = "Logout user. Disable current token")
     @PostMapping("/logout")
     public ResponseEntity<String> logout(HttpServletRequest httpRequest) {
+        // TODO: 30.01.2024 check logout
         authenticationService.logout(httpRequest);
         return ResponseEntity.ok("Logout successful");
     }
