@@ -40,3 +40,4 @@ build/
 /src/main/java/com/winestoreapp/temp/
 /src/main/resources/info/
 /DockerfileTempl
+/upload/pictures/wine/*

@@ -1,0 +1,31 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-shopping-cards-table
+      author: artemmakovskyy
+      changes:
+        - createTable:
+            tableName: shopping_cards
+            columns:
+              - column:
+                  name: total_cost
+                  type: decimal(38,2)
+              - column:
+                  name: id
+                  type: bigint
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+
+              - column:
+                  name: is_deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+
+        - addForeignKeyConstraint:
+            baseColumnNames: id
+            baseTableName: shopping_cards
+            constraintName: fk_shopping_cards_orders
+            referencedColumnNames: id
+            referencedTableName: orders

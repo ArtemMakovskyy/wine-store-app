@@ -1,0 +1,91 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-wine-table
+      author: artemmakovskyy
+      changes:
+        - createTable:
+            tableName: wines
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: vendor_code
+                  type: varchar(255)
+              - column:
+                  name: name
+                  type: varchar(510)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: short_name
+                  type: varchar(255)
+              - column:
+                  name: average_rating_score
+                  type: DECIMAL(3, 2)
+              - column:
+                  name: price
+                  type: DECIMAL(6, 2)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: grape
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: is_decantation
+                  type: boolean
+                  constraints:
+                    nullable: false
+              - column:
+                  name: wine_type
+                  type: enum('DRY', 'SEMI_DRY', 'MEDIUM_SWEET', 'SWEET')
+                  constraints:
+                    nullable: false
+              - column:
+                  name: strength_from
+                  type: DECIMAL(3, 1)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: strength_to
+                  type: DECIMAL(3, 1)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: wine_color
+                  type: enum('RED', 'ROSE', 'WHITE')
+                  constraints:
+                    nullable: false
+              - column:
+                  name: color_describing
+                  type: varchar(255)
+              - column:
+                  name: taste
+                  type: varchar(255)
+              - column:
+                  name: aroma
+                  type: varchar(255)
+              - column:
+                  name: gastronomy
+                  type: varchar(255)
+              - column:
+                  name: description
+                  type: varchar(1020)
+              - column:
+                  name: picture
+                  type: LONGBLOB
+              - column:
+                  name: picture_link
+                  type: varchar(255)
+              - column:
+                  name: is_deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false

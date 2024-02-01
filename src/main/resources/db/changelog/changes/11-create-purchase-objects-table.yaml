@@ -1,0 +1,47 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-purchase-objects-table
+      author: artemmakovskyy
+      changes:
+        - createTable:
+            tableName: purchase_objects
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+
+              - column:
+                  name: quantity
+                  type: int
+
+              - column:
+                  name: price
+                  type: DECIMAL(10, 2)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: wines_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_purchase_objects_wines
+                    references: wines(id)
+
+              - column:
+                  name: shopping_card_id
+                  type: bigint
+                  constraints:
+                    nullable: true
+                    foreignKeyName: fk_purchase_objects_shopping_card
+                    references: shopping_cards(id)
+              - column:
+                  name: is_deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false

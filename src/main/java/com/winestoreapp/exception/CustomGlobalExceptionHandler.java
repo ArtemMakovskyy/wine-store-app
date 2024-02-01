@@ -57,9 +57,45 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
                 HttpStatus.NOT_FOUND, request);
     }
 
+    @ExceptionHandler(value = EmptyDataException.class)
+    protected ResponseEntity<Object> handleEmptyDataException(
+            EmptyDataException ex,
+            WebRequest request) {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", HttpStatus.CONFLICT);
+        body.put("error", "Data is empty. " + ex.getMessage());
+        return handleExceptionInternal(ex, body, new HttpHeaders(),
+                HttpStatus.CONFLICT, request);
+    }
+
+    @ExceptionHandler(value = DataDuplicationException.class)
+    protected ResponseEntity<Object> handleDataDuplicationException(
+            DataDuplicationException ex,
+            WebRequest request) {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", HttpStatus.CONFLICT);
+        body.put("error", "Data duplication.  " + ex.getMessage());
+        return handleExceptionInternal(ex, body, new HttpHeaders(),
+                HttpStatus.CONFLICT, request);
+    }
+
     @ExceptionHandler(value = RegistrationException.class)
     protected ResponseEntity<Object> handleRegistrationException(
             RegistrationException ex,
+            WebRequest request) {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", HttpStatus.BAD_REQUEST);
+        body.put("error", "Registration failed. " + ex.getMessage());
+        return handleExceptionInternal(ex, body, new HttpHeaders(),
+                HttpStatus.BAD_REQUEST, request);
+    }
+
+    @ExceptionHandler(value = TelegramBotNotificationException.class)
+    protected ResponseEntity<Object> handleTelegramBotNotificationException(
+            TelegramBotNotificationException ex,
             WebRequest request) {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", LocalDateTime.now());

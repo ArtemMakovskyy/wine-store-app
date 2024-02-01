@@ -1,0 +1,44 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-orders-table
+      author: artemmakovskyy
+      changes:
+        - createTable:
+            tableName: orders
+            columns:
+              - column:
+                  name: completed_time
+                  type: date
+              - column:
+                  name: registration_time
+                  type: date
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: bigint
+              - column:
+                  name: payment_status
+                  type: enum('CREATED', 'PAID', 'DELIVERING', 'COMPLETED')
+                  constraints:
+                    nullable: true
+
+              - column:
+                  name: is_deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+
+        - addForeignKeyConstraint:
+            baseColumnNames: user_id
+            baseTableName: orders
+            constraintName: fk_orders_users
+            referencedColumnNames: id
+            referencedTableName: users
+

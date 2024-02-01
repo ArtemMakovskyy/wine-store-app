@@ -1,0 +1,55 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-review-table
+      author: artemmakovskyy
+      changes:
+        - createTable:
+            tableName: reviews
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: message
+                  type: varchar(255)
+              - column:
+                  name: rating
+                  type: INTEGER
+              - column:
+                  name: review_date
+                  type: date
+                  constraints:
+                    nullable: false
+              - column:
+                  name: is_deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: wine_id
+                  type: bigint
+              - column:
+                  name: user_id
+                  type: bigint
+        - addForeignKeyConstraint:
+            baseColumnNames: user_id
+            baseTableName: reviews
+            constraintName: fk_reviews_users
+            referencedColumnNames: id
+            referencedTableName: users
+
+        - addForeignKeyConstraint:
+            baseColumnNames: wine_id
+            baseTableName: reviews
+            constraintName: fk_reviews_wines
+            referencedColumnNames: id
+            referencedTableName: wines
+
+            tablespace: InnoDB
+            encoding: utf8mb3
+            collation: utf8_bin

@@ -1,0 +1,49 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-orders-delivery-information-table
+      author: artemmakovskyy
+      changes:
+        - createTable:
+            tableName: orders_delivery_information
+            columns:
+              - column:
+                  name: apartment
+                  type: int
+              - column:
+                  name: floor
+                  type: int
+              - column:
+                  name: house
+                  type: int
+              - column:
+                  name: id
+                  type: bigint
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: additionally
+                  type: varchar(255)
+              - column:
+                  name: city
+                  type: varchar(255)
+              - column:
+                  name: phone
+                  type: varchar(255)
+              - column:
+                  name: street
+                  type: varchar(255)
+
+              - column:
+                  name: is_deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+
+        - addForeignKeyConstraint:
+            baseColumnNames: id
+            baseTableName: orders_delivery_information
+            constraintName: fk_orders_delivery_information_orders
+            referencedColumnNames: id
+            referencedTableName: orders

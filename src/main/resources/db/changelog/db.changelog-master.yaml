@@ -9,3 +9,21 @@ databaseChangeLog:
       file: db/changelog/changes/04-create-users_roles-table.yaml
   - include:
       file: db/changelog/changes/05-insert_users.yaml
+  - include:
+      file: db/changelog/changes/06-create-wine-table.yaml
+  - include:
+      file: db/changelog/changes/07-create-review-table.yaml
+  - include:
+      file: db/changelog/changes/08-create-orders-table.yaml
+  - include:
+      file: db/changelog/changes/09-create-orders-delivery-information-table.yaml
+  - include:
+      file: db/changelog/changes/10-create-shopping-cards-table.yaml
+  - include:
+      file: db/changelog/changes/11-create-purchase-objects-table.yaml
+
+
+
+
+
+
