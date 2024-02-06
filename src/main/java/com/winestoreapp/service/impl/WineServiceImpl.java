@@ -6,6 +6,7 @@ import com.winestoreapp.dto.wine.WineDto;
 import com.winestoreapp.exception.EmptyDataException;
 import com.winestoreapp.model.Wine;
 import com.winestoreapp.repository.WineRepository;
+import com.winestoreapp.service.WineService;
 import jakarta.persistence.EntityNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -29,27 +30,34 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class WineServiceImpl implements WineService{
-    private static final int NUMBER_OF_SIMBOLS_AFTER_COMMA = 2;
+public class WineServiceImpl implements WineService {
     private static final String SAVE_PATH = "upload/pictures/wine/";
     private final WineRepository wineRepository;
     private final WineMapper wineMapper;
-    @Value("${limiter.number.of.recorded.ratings}")
-    private int limiterOnTheNumberOfRecordedRatings;
+    // TODO: 07.02.2024 dell it if not use
+    @Value("${base.url}")
+    private URL baseUrl;
 
     @Override
     public WineDto add(WineCreateRequestDto createDto) {
-        final Wine savedWine = wineRepository.save(wineMapper.toEntity(createDto));
-        System.out.println(savedWine.getId());
+        // TODO: 06.02.2024 save info
+        //if vendor code null create it
+        //if shortname null  code null create it
+        final Wine wine = wineMapper.toEntity(createDto);
+        // TODO: 06.02.2024 checkImageForLoading think about saving link
+        final Wine savedWine = wineRepository.save(wine);
+        // TODO: 06.02.2024 save file
+        // TODO: 06.02.2024 result
         return wineMapper.toDto(savedWine);
     }
 
-    public URL addImage(
+    @Override
+    public URL updateImage(
             Long id,
             MultipartFile multipartFile,
-            boolean addToDb,
-            boolean addToPath)
+            boolean addToDb)
             throws MalformedURLException {
+        // TODO: 06.02.2024 think about exceptions and constants
         if (multipartFile.isEmpty()) {
             throw new EmptyDataException("Please select the file");
         }
@@ -62,20 +70,18 @@ public class WineServiceImpl implements WineService{
         } catch (IOException e) {
             throw new RuntimeException("Error getting bytes from image");
         }
-        /// TODO: 02.02.2024 customize local host
         if (addToDb) {
             wineFromDb.setPicture(imageBytes);
-            wineFromDb.setPictureLink(new URL("http://localhost:8080/api/wines/" + id + "/image/db"));
+            wineFromDb.setPictureLink(new URL(baseUrl + "api/wines/" + id + "/image/db"));
             log.info("Image " + multipartFile.getOriginalFilename()
                     + " successfully added into database");
             wineRepository.save(wineFromDb);
         }
-        // TODO: 02.02.2024 check it
-        if (addToPath) {
+        if (!addToDb) {
             String filePath = SAVE_PATH + id + getFileExtension(multipartFile);
             try (FileOutputStream fos = new FileOutputStream(filePath)) {
                 fos.write(imageBytes);
-                wineFromDb.setPictureLink(new URL("http://localhost:8080/api/wines/" + id + "/image/path"));
+                wineFromDb.setPictureLink(new URL(baseUrl + "api/wines/" + id + "/image/path"));
                 wineRepository.save(wineFromDb);
                 log.info("Image successfully added into file " + filePath);
             } catch (IOException e) {
@@ -85,38 +91,30 @@ public class WineServiceImpl implements WineService{
         return wineFromDb.getPictureLink();
     }
 
-        //    public void addRating(Long wineId, Integer rating) {
-        //        final Wine wine = wineRepository.findById(wineId)
-        //                .orElseThrow(() -> new RuntimeException(
-        //                "Can't get wine by id " + wineId));
-        //        if (wine.getRatings().isEmpty()) {
-        //            List<Integer> ratings = new ArrayList<>();
-        //            wine.setRatings(ratings);
-        //        }
-        //        LinkedList<Integer> ratings = new LinkedList<>(wine.getRatings());
-        //        if (ratings.size() >= limiterOnTheNumberOfRecordedRatings) {
-        //            ratings.removeFirst();
-        //        }
-        //        ratings.add(rating);
-        //        final BigDecimal averageRatingScore =
-        //                BigDecimal.valueOf(
-        //                        calculateAverageRatingScore(ratings)
-        //                ).setScale(NUMBER_OF_SIMBOLS_AFTER_COMMA, RoundingMode.HALF_UP);
-        //        wine.setAverageRatingScore(averageRatingScore);
-        //        wine.setRatings(new ArrayList<>(ratings));
-        //        Wine save = wineRepository.save(wine);
-        //        System.out.println(save);
-        //    }
-
-    private double calculateAverageRatingScore(List<Integer> ratings) {
-        final double numberOfRatingsAsPercentage
-                = ratings.size() / (double) limiterOnTheNumberOfRecordedRatings;
-        return ratings.stream()
-                .mapToDouble(Integer::doubleValue)
-                .average()
-                .orElse(0.00) + numberOfRatingsAsPercentage;
+    @Override
+    public List<WineDto> findAll() {
+        return wineRepository.findAll().stream()
+                .map(wineMapper::toDto)
+                .toList();
     }
 
+    @Override
+    public WineDto findById(Long id) {
+        return wineMapper.toDto(wineRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Can't find wine by id: " + id)));
+    }
+
+    @Override
+    public boolean isDeleteById(Long id) {
+        if (!wineRepository.existsById(id)) {
+            throw new EntityNotFoundException("Can't find wine by id: " + id);
+        }
+        wineRepository.deleteById(id);
+        return true;
+    }
+
+    // TODO: 06.02.2024 old code
     public String getFileExtension(MultipartFile multipartFile) {
         // Получаем оригинальное имя файла
         String originalFilename = multipartFile.getOriginalFilename();
@@ -131,7 +129,6 @@ public class WineServiceImpl implements WineService{
     }
 
     public Wine getWineById(Long id) {
-
         return wineRepository.findById(id).orElseThrow();
     }
 
@@ -144,7 +141,7 @@ public class WineServiceImpl implements WineService{
         // TODO: 01.02.2024 whi this need
         HttpHeaders headers = new HttpHeaders();
         // TODO: 02.02.2024 fix it
-        headers.add(HttpHeaders.CONTENT_DISPOSITION, "inline;filename=originFileName.jpg");
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "inline;filename=" + id + "jpg");
 
         return ResponseEntity.ok()
                 .headers(headers)

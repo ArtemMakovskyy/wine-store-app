@@ -11,5 +11,6 @@ import org.mapstruct.ReportingPolicy;
 public interface WineMapper {
 
     WineDto toDto(Wine wine);
+
     Wine toEntity(WineCreateRequestDto dto);
 }

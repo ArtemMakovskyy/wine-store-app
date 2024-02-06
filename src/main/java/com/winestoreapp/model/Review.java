@@ -38,6 +38,7 @@ public class Review {
 
     private Integer rating;
 
+    // TODO: 07.02.2024 it saves without time
     @Column(name = "review_date", nullable = false)
     private LocalDate reviewDate;
 
