@@ -25,8 +25,11 @@ public class PurchaseObject {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    private Wine wines;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Wine wine;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private ShoppingCard shoppingCard;
 
     private Integer quantity;
 

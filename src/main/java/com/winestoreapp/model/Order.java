@@ -1,5 +1,6 @@
 package com.winestoreapp.model;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -12,7 +13,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.SQLDelete;
@@ -29,21 +30,23 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToOne(mappedBy = "order", fetch = FetchType.EAGER)
-    @JoinColumn(name = "shopping_card_id")
+    @OneToOne(mappedBy = "order",
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL)
     private ShoppingCard shoppingCard;
 
-    @OneToOne(mappedBy = "order", fetch = FetchType.EAGER)
-    @JoinColumn(name = "delivery_information_id")
+    @OneToOne(mappedBy = "order",
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL)
     private OrderDeliveryInformation deliveryInformation;
 
-    private LocalDate registrationTime;
+    private LocalDateTime registrationTime;
 
-    private LocalDate completedTime;
+    private LocalDateTime completedTime;
 
     @Enumerated(EnumType.STRING)
     private OrderPaymentStatus paymentStatus;

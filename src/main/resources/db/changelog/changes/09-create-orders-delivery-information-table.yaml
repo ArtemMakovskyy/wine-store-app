@@ -18,9 +18,18 @@ databaseChangeLog:
               - column:
                   name: id
                   type: bigint
+                  autoIncrement: true
                   constraints:
                     primaryKey: true
                     nullable: false
+
+              - column:
+                  name: order_id
+                  type: bigint
+                  constraints:
+                    nullable: true
+                    unique: true
+
               - column:
                   name: additionally
                   type: varchar(255)

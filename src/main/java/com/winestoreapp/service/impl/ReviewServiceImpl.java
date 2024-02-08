@@ -11,12 +11,12 @@ import com.winestoreapp.repository.UserRepository;
 import com.winestoreapp.repository.WineRepository;
 import com.winestoreapp.service.ReviewService;
 import jakarta.transaction.Transactional;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -31,44 +31,49 @@ public class ReviewServiceImpl implements ReviewService {
     private int limiterOnTheNumberOfRecordedRatings;
 
     @Override
-    // TODO: 07.02.2024 is it correct?
     @Transactional
     public ReviewDto addReview(CreateReviewDto createDto) {
-        System.out.println(createDto);
-        final Review review = reviewMapper.createDtoToEntity(createDto);
-        review.setReviewDate(LocalDate.now());
+        if (removeOutdatedReviews(createDto.getWineId(), createDto.getUserId())) {
+            log.info("Outdated reviews were deleted");
+        }
+        Review review = reviewMapper.createDtoToEntity(createDto);
+        review.setReviewDate(LocalDateTime.now());
         review.setUser(userRepository.findById(createDto.getUserId()).get());
-        final Wine wine = wineRepository.findById(createDto.getWineId()).get();
+        Wine wine = wineRepository.findById(createDto.getWineId()).get();
         review.setWine(wine);
-        review.setReviewDate(LocalDate.now());
-        // TODO: 07.02.2024 clean redundant
-        // TODO: 07.02.2024 save average
-        // TODO: 07.02.2024 change format in db on DATETIME / TIMESTAMP
-        System.out.println(LocalDateTime.now());
+        review.setReviewDate(LocalDateTime.now());
         final ReviewDto reviewDto = reviewMapper.toDto(reviewRepository.save(review));
         System.out.println(reviewDto);
-        calculateWineAverageRatingScoreThenSave(createDto.getUserId(), createDto.getWineId());
+        calculateWineAverageRatingScoreThenSave(createDto.getWineId());
         return reviewDto;
     }
 
     @Override
-    public List<ReviewWithUserDescriptionDto> findAllByWineId(Long wineId) {
-        return reviewRepository.findAllByWineIdOrderById(wineId).stream()
+    public List<ReviewWithUserDescriptionDto> findAllByWineId(Long wineId, Pageable pageable) {
+        return reviewRepository.findAllByWineIdOrderByIdDesc(wineId, pageable).stream()
                 .map(reviewMapper::toUserDescriptionDto)
                 .toList();
     }
 
-    private void calculateWineAverageRatingScoreThenSave(Long userId, Long wineId) {
-        final long reviewsQuantity = reviewRepository.count();
-        if (reviewsQuantity >= limiterOnTheNumberOfRecordedRatings) {
-            final Long minIdByUserIdAndWineId = reviewRepository
-                    .findMinIdByUserIdAndWineId(userId, wineId);
-            reviewRepository.deleteById(minIdByUserIdAndWineId);
-            log.info("Added new rating and deleted old with id: " + minIdByUserIdAndWineId);
+    private boolean removeOutdatedReviews(Long wineId, Long userId) {
+        final List<Review> allByWineIdAndUserId
+                = reviewRepository.findAllByWineIdAndUserId(
+                wineId, userId);
+        if (!allByWineIdAndUserId.isEmpty()) {
+            for (Review review : allByWineIdAndUserId) {
+                reviewRepository.deleteById(review.getId());
+            }
         }
-        final Double averageRatingByWineIdAndUserId =
-                reviewRepository.findAverageRatingByWineIdAndUserId(wineId, userId)
-                        + ((double) reviewsQuantity / limiterOnTheNumberOfRecordedRatings);
-        wineRepository.updateAverageRatingScore(userId, averageRatingByWineIdAndUserId);
+        return true;
+    }
+
+    private void calculateWineAverageRatingScoreThenSave(Long wineId) {
+        final List<Review> allByWineId = reviewRepository.findAllByWineId(wineId);
+        if (allByWineId.size() > limiterOnTheNumberOfRecordedRatings) {
+            reviewRepository.deleteById(reviewRepository.findMinIdByWineId(wineId));
+        }
+        double averageRatingByWineId = reviewRepository.findAverageRatingByWineId(wineId)
+                + ((double)allByWineId.size() / limiterOnTheNumberOfRecordedRatings);
+        wineRepository.updateAverageRatingScore(wineId, averageRatingByWineId);
     }
 }

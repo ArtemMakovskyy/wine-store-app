@@ -12,6 +12,7 @@ databaseChangeLog:
               - column:
                   name: id
                   type: bigint
+                  autoIncrement: true
                   constraints:
                     primaryKey: true
                     nullable: false
@@ -22,6 +23,13 @@ databaseChangeLog:
                   defaultValueBoolean: false
                   constraints:
                     nullable: false
+
+              - column:
+                  name: order_id
+                  type: bigint
+                  constraints:
+                    nullable: true
+                    unique: true
 
         - addForeignKeyConstraint:
             baseColumnNames: id

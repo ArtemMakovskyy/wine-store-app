@@ -8,10 +8,10 @@ databaseChangeLog:
             columns:
               - column:
                   name: completed_time
-                  type: date
+                  type: DATETIME
               - column:
                   name: registration_time
-                  type: date
+                  type: DATETIME
               - column:
                   name: id
                   type: bigint
@@ -24,7 +24,7 @@ databaseChangeLog:
                   type: bigint
               - column:
                   name: payment_status
-                  type: enum('CREATED', 'PAID', 'DELIVERING', 'COMPLETED')
+                  type: enum('PENDING', 'PAID')
                   constraints:
                     nullable: true
 

@@ -4,7 +4,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -35,15 +34,16 @@ public class Wine {
     @Column(name = "vendor_code")
     private String vendorCode;
 
+    @Column(name = "reserve_type")
+    private String reserveType;
+
     @Column(nullable = false)
     private String name;
 
     @Column(name = "short_name")
     private String shortName;
 
-    @OneToMany(
-            mappedBy = "wine",
-             fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "wine")
     private Set<Review> reviews;
 
     @Column(name = "average_rating_score")

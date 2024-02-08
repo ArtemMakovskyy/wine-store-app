@@ -12,8 +12,12 @@ import java.net.URL;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -46,11 +50,9 @@ public class WineController {
     @GetMapping("/{id}/image/path")
     public ResponseEntity<Resource> getWinePicturePath(
             @PathVariable Long id) throws IOException {
-        System.out.println("getWinePicturePath");
         return wineService.getPictureByIdByPath(id);
     }
 
-    //    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @Operation(summary = "Find wine by id",
             description = "Find existing wine by id")
     @GetMapping("/{id}")
@@ -59,9 +61,9 @@ public class WineController {
         return wineService.findById(id);
     }
 
-    //    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_MANAGER')")
     @Operation(summary = "Delete wine by id",
-            description = "Delete existing wine by id")
+            description = "Delete existing wine by id. Available for manager12345@gmail.com")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public boolean deleteWineById(
@@ -69,17 +71,26 @@ public class WineController {
         return wineService.isDeleteById(id);
     }
 
-    //    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @Operation(summary = "Find all wines",
-            description = "Find all wines")
+            description = """
+                    Find all wines. You can set pagination by: page, size, and sort parameters. 
+                    By default, size = 4, page = 0, sort by 'averageRatingScore,DESC' 
+                    and after sort by 'id,ASC'""")
     @GetMapping
-    public List<WineDto> findAllWines() {
-        return wineService.findAll();
+    public List<WineDto> findAllWines(
+            @PageableDefault(
+                    size = 4,
+                    page = 0,
+                    sort = {"averageRatingScore", "id"},
+                    direction = Sort.Direction.DESC)
+                    Pageable pageable) {
+        return wineService.findAll(pageable);
     }
 
-    //    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_MANAGER')")
     @Operation(summary = "Creating a new Wine.",
-            description = "Creating a new Wine with valid data")
+            description =
+                    "Creating a new Wine with valid data. Available for manager12345@gmail.com")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public WineDto createWine(
@@ -87,10 +98,11 @@ public class WineController {
         return wineService.add(createDto);
     }
 
+    @PreAuthorize("hasRole('ROLE_MANAGER')")
     @Operation(summary = "Add an image into db.",
-            description = "Add an image into database")
+            description = "Add an image into database. Available for manager12345@gmail.com")
     @PatchMapping("/{id}/image/db")
-    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseStatus(HttpStatus.OK)
     public URL addImageByIdIntoDb(
             @PathVariable Long id,
             @RequestParam("file") MultipartFile file
@@ -98,20 +110,15 @@ public class WineController {
         return wineService.updateImage(id, file, true);
     }
 
+    @PreAuthorize("hasRole('ROLE_MANAGER')")
     @Operation(summary = "Add an image into path.",
-            description = "Add an image into path")
+            description = "Add an image into path. Available for manager12345@gmail.com")
     @PatchMapping("/{id}/image/path")
-    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseStatus(HttpStatus.OK)
     public URL addImageByIdIntoPath(
             @PathVariable Long id,
             @RequestParam("file") MultipartFile file
     ) throws MalformedURLException {
         return wineService.updateImage(id, file, false);
-    }
-
-    @GetMapping("/fill")
-    public String createWines() throws MalformedURLException {
-
-        return "wines have added";
     }
 }

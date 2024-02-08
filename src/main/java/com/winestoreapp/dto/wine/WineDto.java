@@ -10,6 +10,7 @@ import lombok.Data;
 public class WineDto {
     private Long id;
     private String vendorCode;
+    private String reserveType;
     private String name;
     private String shortName;
     private BigDecimal averageRatingScore;

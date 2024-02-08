@@ -14,8 +14,7 @@ public class Application {
         SpringApplication.run(Application.class, args);
         log.info("API Documentation Overview: http://localhost:8080/api/swagger-ui/index.html#/");
         log.info("Health check controller: http://localhost:8080/api/health");
-        log.info("Health check html: file:///C:/Users/Artem/Documents/Java/UltimateJet"
-                + "Brains/wine-store-app/frontend/public/index.html");
+        log.info("Health check html: http://localhost:8080/api/");
         // TODO: 30.01.2024 write logs in code
         //        https://www.youtube.com/watch?v=jPTIKU3VPQk
         //        https://dashboard.ngrok.com/get-started/setup/windows

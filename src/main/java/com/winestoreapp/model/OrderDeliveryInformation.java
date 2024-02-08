@@ -7,7 +7,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
@@ -22,6 +21,7 @@ import org.hibernate.annotations.Where;
 @SQLDelete(sql = "UPDATE orders_delivery_information SET is_deleted = true WHERE id=?")
 @Where(clause = "is_deleted=false")
 public class OrderDeliveryInformation {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -33,9 +33,8 @@ public class OrderDeliveryInformation {
     private String phone;
     private String additionally;
 
-    @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "id")
-    @MapsId
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_id")
     private Order order;
 
     @Column(nullable = false)

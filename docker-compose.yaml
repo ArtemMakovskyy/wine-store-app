@@ -16,15 +16,16 @@ services:
       timeout: 30s
       retries: 3
   app:
+    env_file: ./.env
     depends_on:
       - db_sql_host
     restart: on-failure
     image: wine_store_api:v01
     build: .
     ports:
-#      - "8080:8080"
-      - "8081:8080"
-      - "5005:5005"
+      - "8080:8080"
+#      - "8081:8080"
+      - "5006:5005"
 
     environment:
       SPRING_APPLICATION_JSON: '{

@@ -25,11 +25,11 @@ databaseChangeLog:
                     nullable: false
 
               - column:
-                  name: wines_id
+                  name: wine_id
                   type: bigint
                   constraints:
                     nullable: false
-                    foreignKeyName: fk_purchase_objects_wines
+                    foreignKeyName: fk_purchase_objects_wine
                     references: wines(id)
 
               - column:

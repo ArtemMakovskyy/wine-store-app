@@ -17,6 +17,9 @@ databaseChangeLog:
                   name: vendor_code
                   type: varchar(255)
               - column:
+                  name: reserve_type
+                  type: varchar(255)
+              - column:
                   name: name
                   type: varchar(510)
                   constraints:

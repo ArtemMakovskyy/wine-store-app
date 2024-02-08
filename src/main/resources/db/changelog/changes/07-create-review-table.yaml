@@ -21,7 +21,7 @@ databaseChangeLog:
                   type: INTEGER
               - column:
                   name: review_date
-                  type: date
+                  type: DATETIME
                   constraints:
                     nullable: false
               - column:

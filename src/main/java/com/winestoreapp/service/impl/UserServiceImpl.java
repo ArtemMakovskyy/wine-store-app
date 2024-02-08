@@ -3,8 +3,10 @@ package com.winestoreapp.service.impl;
 import com.winestoreapp.dto.mapper.UserMapper;
 import com.winestoreapp.dto.user.UserRegistrationRequestDto;
 import com.winestoreapp.dto.user.UserResponseDto;
+import com.winestoreapp.exception.EntityNotFoundException;
 import com.winestoreapp.exception.RegistrationException;
 import com.winestoreapp.model.Role;
+import com.winestoreapp.model.RoleName;
 import com.winestoreapp.model.User;
 import com.winestoreapp.repository.RoleRepository;
 import com.winestoreapp.repository.UserRepository;
@@ -35,10 +37,20 @@ public class UserServiceImpl implements UserService {
         user.setLastName(request.getLastName());
         Role roleUser =
                 roleRepository.findById(3L).orElseThrow(
-                        () -> new RuntimeException("Can't find ROLE_CUSTOMER by id"));
+                        () -> new EntityNotFoundException("Can't find ROLE_CUSTOMER by id"));
         user.setRoles(Set.of(roleUser));
 
         final User savedUser = userRepository.save(user);
         return userMapper.toDto(savedUser);
+    }
+
+    @Override
+    public UserResponseDto updateRole(Long userId, String role) {
+        final User userFromDb = userRepository.findById(userId).orElseThrow(
+                () -> new EntityNotFoundException("Can't find user by id " + userId));
+        final Role roleFromDb = roleRepository.findByName(RoleName.valueOf(role)).orElseThrow(
+                () -> new EntityNotFoundException("Can't find role " + role));
+        userFromDb.setRoles(Set.of(roleFromDb));
+        return userMapper.toDto(userRepository.save(userFromDb));
     }
 }
