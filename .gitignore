@@ -1,7 +1,5 @@
-.env
 .loadvines
 src/main/java/com/winestoreapp/temp/DockerfileTemplate
-/src/main/resources/application.properties
 HELP.md
 target/
 !.mvn/wrapper/maven-wrapper.jar
