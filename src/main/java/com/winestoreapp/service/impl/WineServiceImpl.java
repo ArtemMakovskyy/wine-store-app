@@ -11,7 +11,6 @@ import com.winestoreapp.model.WineType;
 import com.winestoreapp.repository.WineRepository;
 import com.winestoreapp.service.WineService;
 import jakarta.annotation.PostConstruct;
-import jakarta.transaction.Transactional;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -158,6 +157,7 @@ public class WineServiceImpl implements WineService {
         Path path = Paths.get(imagePath);
         return Files.readAllBytes(path);
     }
+
     public ResponseEntity<Resource> getPictureByIdFromDb(Long id) {
         final Wine wine = wineRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Can't find wine by id: " + id));
