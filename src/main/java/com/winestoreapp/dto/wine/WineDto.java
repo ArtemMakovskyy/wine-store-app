@@ -3,13 +3,13 @@ package com.winestoreapp.dto.wine;
 import com.winestoreapp.model.WineColor;
 import com.winestoreapp.model.WineType;
 import java.math.BigDecimal;
-import java.net.URL;
 import lombok.Data;
 
 @Data
 public class WineDto {
     private Long id;
     private String vendorCode;
+    private String qualityLevel;
     private String reserveType;
     private String name;
     private String shortName;
@@ -26,5 +26,6 @@ public class WineDto {
     private String aroma;
     private String gastronomy;
     private String description;
-    private URL pictureLink;
+    private String pictureLink;
+    private String pictureLink2;
 }

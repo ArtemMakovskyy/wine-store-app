@@ -1,0 +1,15 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-picture_link2-and-delete-picture-field-in-wine-table
+      author: artemmakovskyy
+      changes:
+        - addColumn:
+            tableName: wines
+            columns:
+              - column:
+                  name: picture_link2
+                  type: varchar(510)
+
+        - dropColumn:
+            tableName: wines
+            columnName: picture

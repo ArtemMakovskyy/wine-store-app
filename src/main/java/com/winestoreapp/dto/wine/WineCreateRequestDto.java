@@ -14,6 +14,8 @@ public class WineCreateRequestDto {
     @Schema(example = "MSD 2019")
     @NotBlank(message = "Vendor Code should not be blank")
     private String vendorCode;
+    @NotBlank(message = "Select or Grand Reserve ")
+    private String qualityLevel;
     @Schema(example = "Limeted Edition Vine")
     private String reserveType;
     @Schema(example = "Prince Trubetskoi Select Riesling")
@@ -45,6 +47,8 @@ public class WineCreateRequestDto {
     private String gastronomy;
     @Schema(example = "description")
     private String description;
-    @Schema(example = "byte[] picture")
-    private byte[] picture;
+    @Schema(example = "LINK")
+    private String pictureLink;
+    @Schema(example = "LINK2")
+    private String pictureLink2;
 }

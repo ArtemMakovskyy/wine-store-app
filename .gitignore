@@ -33,10 +33,12 @@ build/
 
 ### VS Code ###
 .vscode/
-/mvnw.cmd
-/mvnw
-/.mvn/
 /src/main/java/com/winestoreapp/temp/
 /src/main/resources/info/
 /DockerfileTempl
 /upload/pictures/wine/*
+/.metadata/
+/.mvn/
+/x.dockerignore
+/mvnw.cmd
+/mvnw

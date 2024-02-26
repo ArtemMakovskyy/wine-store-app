@@ -21,7 +21,8 @@ databaseChangeLog:
       file: db/changelog/changes/10-create-shopping-cards-table.yaml
   - include:
       file: db/changelog/changes/11-create-purchase-objects-table.yaml
-
+  - include:
+      file: db/changelog/changes/12-changes-in-wine-table.yaml
 
 
 

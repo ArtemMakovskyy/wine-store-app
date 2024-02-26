@@ -9,4 +9,5 @@ public interface WineRepository extends JpaRepository<Wine, Long> {
     @Modifying
     @Query("UPDATE Wine w SET w.averageRatingScore = :averageRatingScore WHERE w.id = :wineId")
     void updateAverageRatingScore(Long wineId, Double averageRatingScore);
+
 }

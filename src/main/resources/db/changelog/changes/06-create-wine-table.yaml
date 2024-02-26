@@ -17,6 +17,9 @@ databaseChangeLog:
                   name: vendor_code
                   type: varchar(255)
               - column:
+                  name: quality_level
+                  type: varchar(255)
+              - column:
                   name: reserve_type
                   type: varchar(255)
               - column:
@@ -85,7 +88,7 @@ databaseChangeLog:
                   type: LONGBLOB
               - column:
                   name: picture_link
-                  type: varchar(255)
+                  type: varchar(510)
               - column:
                   name: is_deleted
                   type: boolean

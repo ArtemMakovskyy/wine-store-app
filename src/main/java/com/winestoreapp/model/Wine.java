@@ -7,11 +7,9 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
-import java.net.URL;
 import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
@@ -33,6 +31,9 @@ public class Wine {
 
     @Column(name = "vendor_code")
     private String vendorCode;
+
+    @Column(name = "quality_level")
+    private String qualityLevel;
 
     @Column(name = "reserve_type")
     private String reserveType;
@@ -79,11 +80,9 @@ public class Wine {
     private String gastronomy;
     private String description;
 
-    @Lob
-    @Column(name = "picture", columnDefinition = "LONGBLOB")
-    private byte[] picture;
+    private String pictureLink;
 
-    private URL pictureLink;
+    private String pictureLink2;
 
     @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted = false;
