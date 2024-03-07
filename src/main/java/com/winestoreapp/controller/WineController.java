@@ -85,7 +85,7 @@ public class WineController {
     @PreAuthorize("hasRole('ROLE_MANAGER')")
     @Operation(summary = "Add an image into path.",
             description = "Add an image into path. Available for manager12345@gmail.com")
-    @PatchMapping("/{id}/image/path")
+    @PatchMapping("/{id}/image")
     @ResponseStatus(HttpStatus.OK)
     public WineDto addImageByIdIntoPath(
             @PathVariable Long id,

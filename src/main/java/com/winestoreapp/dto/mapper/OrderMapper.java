@@ -7,11 +7,14 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
-@Mapper(config = MapperConfig.class, unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(config = MapperConfig.class,
+        unmappedTargetPolicy = ReportingPolicy.IGNORE,
+        uses = ShoppingCardMapper.class
+)
 public interface OrderMapper {
 
     @Mapping(target = "userId", source = "user.id")
-    @Mapping(target = "shoppingCardId", source = "shoppingCard.id")
-    @Mapping(target = "deliveryInformationId", source = "deliveryInformation.id")
+    @Mapping(target = "shoppingCardDto", source = "shoppingCard")
+    @Mapping(target = "orderDeliveryInformationDto", source = "deliveryInformation")
     OrderDto toDto(Order order);
 }

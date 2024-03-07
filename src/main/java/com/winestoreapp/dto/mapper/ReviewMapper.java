@@ -1,7 +1,7 @@
 package com.winestoreapp.dto.mapper;
 
 import com.winestoreapp.config.MapperConfig;
-import com.winestoreapp.dto.review.CreateReviewDto;
+import com.winestoreapp.dto.review.CreateOldReviewDto;
 import com.winestoreapp.dto.review.ReviewDto;
 import com.winestoreapp.dto.review.ReviewWithUserDescriptionDto;
 import com.winestoreapp.model.Review;
@@ -20,5 +20,5 @@ public interface ReviewMapper {
     @Mapping(target = "userLastName", source = "user.lastName")
     ReviewWithUserDescriptionDto toUserDescriptionDto(Review review);
 
-    Review createDtoToEntity(CreateReviewDto dto);
+    Review createDtoToEntity(CreateOldReviewDto dto);
 }

@@ -1,8 +1,10 @@
 package com.winestoreapp.repository;
 
 import com.winestoreapp.model.Order;
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -18,5 +20,13 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     void updateOrderPaymentStatusAsPaidAndSetCurrentDate(
             @Param("orderId") Long orderId);
 
+    @EntityGraph(attributePaths = {"shoppingCard.purchaseObjects.wine"})
     Page<Order> findAllByUserId(Long userId, Pageable pageable);
+
+    @EntityGraph(attributePaths = {"shoppingCard.purchaseObjects.wine"})
+    Optional<Order> findById(Long id);
+
+    @EntityGraph(attributePaths = {"shoppingCard.purchaseObjects.wine"})
+    Page<Order> findAll(Pageable pageable);
+
 }

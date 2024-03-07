@@ -25,13 +25,11 @@ public class OrderDeliveryInformation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private String zipCode;
+    private String region;
     private String city;
     private String street;
-    private Integer house;
-    private Integer floor;
-    private Integer apartment;
-    private String phone;
-    private String additionally;
+    private String comment;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")

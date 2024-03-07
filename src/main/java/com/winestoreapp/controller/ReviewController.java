@@ -1,7 +1,6 @@
 package com.winestoreapp.controller;
 
 import com.winestoreapp.dto.review.CreateReviewDto;
-import com.winestoreapp.dto.review.ReviewDto;
 import com.winestoreapp.dto.review.ReviewWithUserDescriptionDto;
 import com.winestoreapp.service.ReviewService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -30,14 +29,19 @@ import org.springframework.web.bind.annotation.RestController;
 public class ReviewController {
     private final ReviewService reviewService;
 
+    //    @PostMapping("/old")
+    //    public ReviewDto addOldReview(@RequestBody @Valid CreateOldReviewDto createDto) {
+    //        return reviewService.addReview(createDto);
+    //    }
+
     @Operation(summary = "Add review to wine.",
             description = """
                     Adds a review to wine from a specific User. A specific user can't leave more
-                     than one review of one kind of wine. If a review already exists, an earlier 
+                     than one review of one kind of wine. If a review already exists, an earlier
                      review with a rating is deleted, new adds.""")
     @PostMapping
-    public ReviewDto addReview(@RequestBody @Valid CreateReviewDto createDto) {
-        return reviewService.addReview(createDto);
+    public ReviewWithUserDescriptionDto addReview(@RequestBody @Valid CreateReviewDto createDto) {
+        return reviewService.addReviewV2(createDto);
     }
 
     @Operation(summary = "Find all reviews by wine id.",
@@ -48,7 +52,7 @@ public class ReviewController {
             @PathVariable Long wineId,
             @PageableDefault(size = 4, page = 0, sort = {"reviewDate"},
                     direction = Sort.Direction.DESC)
-                    Pageable pageable) {
+            Pageable pageable) {
         return reviewService.findAllByWineId(wineId, pageable);
     }
 }

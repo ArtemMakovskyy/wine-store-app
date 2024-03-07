@@ -4,7 +4,6 @@ import com.winestoreapp.validation.FieldMatch;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
@@ -14,7 +13,7 @@ import lombok.Data;
         fieldMatch = "repeatPassword",
         message = "Passwords do not match!"
 )
-public class UserRegistrationRequestDto {
+public class UserReviewDto {
     @Email(regexp = ".{5,20}@(\\S+)$",
             message = "length must be from 5 characters to 20 before @")
     @Schema(example = "customer@email.com")
@@ -26,7 +25,6 @@ public class UserRegistrationRequestDto {
     @Schema(example = "lastName")
     private String lastName;
     @Size(min = 10, max = 10, message = "Phone number must be 10 digits. Like 0509876543")
-    @NotEmpty(message = "you should enter phone number like 0509876543")
     private String phoneNumber;
     @Size(min = 4, max = 20, message = "must be from 4 to 20 characters")
     @Schema(example = "password1234")

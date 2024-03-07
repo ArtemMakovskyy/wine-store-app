@@ -7,6 +7,11 @@ databaseChangeLog:
             tableName: orders
             columns:
               - column:
+                  name: order_number
+                  type: varchar(20)
+                  constraints:
+                    unique: true
+              - column:
                   name: completed_time
                   type: DATETIME
               - column:

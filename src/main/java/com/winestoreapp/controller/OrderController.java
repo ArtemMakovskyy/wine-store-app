@@ -47,6 +47,12 @@ public class OrderController {
         return orderService.findAllByUserId(userId, pageable);
     }
 
+    //    @ResponseStatus(HttpStatus.CREATED)
+    //    @PostMapping("/old")
+    //    public OrderDto addOldOrder(@RequestBody @Valid CreateOrderOldDto dto) {
+    //        return orderService.createOldOrder(dto);
+    //    }
+
     @Operation(summary = "Add new order",
             description = "Save new order into database")
     @ResponseStatus(HttpStatus.CREATED)

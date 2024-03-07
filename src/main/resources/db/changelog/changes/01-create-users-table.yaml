@@ -13,24 +13,29 @@ databaseChangeLog:
                   constraints:
                     primaryKey: true
                     nullable: false
+
               - column:
                   name: email
                   type: varchar(255)
                   constraints:
-                    nullable: false
                     unique: true
+
               - column:
                   name: first_name
                   type: varchar(255)
                   constraints:
                     nullable: false
+
               - column:
-                  name: last_name
+                  name: phone_number
                   type: varchar(255)
-                  constraints:
-                    nullable: false
+
               - column:
                   name: password
+                  type: varchar(255)
+
+              - column:
+                  name: last_name
                   type: varchar(255)
                   constraints:
                     nullable: false

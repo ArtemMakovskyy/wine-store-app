@@ -4,20 +4,17 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
-public class CreateReviewDto {
+public class CreateOldReviewDto {
     @NotNull(message = "Please enter wine ID")
     @Schema(example = "1")
     private Long wineId;
-    @NotNull(message = "Please input users first and last names")
-    @Schema(example = "Ivan Petrov")
-    private String userFirstAndLastName;
+    @NotNull(message = "Please enter user ID")
+    @Schema(example = "2")
+    private Long userId;
     @Schema(example = "This is a great wine!")
-    @Size(min = 5, max = 255, message = "The message must be between 5 and 255 characters")
-    @NotNull(message = "The review shouldn't be empty")
     private String message;
     @Schema(example = "Enter your rating from 1 to 5")
     @Min(value = 1, message = "must be greater then 0")

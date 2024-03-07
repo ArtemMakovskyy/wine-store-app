@@ -330,8 +330,8 @@ public class WineServiceImpl implements WineService {
                                     a deep, rich wine with a vibrant berry profile as well
                                     as rich spice and animalic tones. This wine goes well
                                     with meat dishes and grilled dishes""",
-                            IMAGE_PATH + "Shiraz-RedDry3.png",
-                            IMAGE_PATH + "Shiraz-RedDry.png"
+                            IMAGE_PATH + "Shiraz-RedDry.png",
+                            IMAGE_PATH + "Shiraz-RedDry3.png"
                     ));
             add(
                     new WineCreateRequestDto(
