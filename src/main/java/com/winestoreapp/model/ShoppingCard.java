@@ -1,5 +1,6 @@
 package com.winestoreapp.model;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -32,7 +33,7 @@ public class ShoppingCard {
     @JoinColumn(name = "order_id")
     private Order order;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "shopping_card_id")
     private Set<PurchaseObject> purchaseObjects;
 

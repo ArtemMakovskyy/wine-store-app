@@ -38,7 +38,9 @@ public class ReviewController {
             description = """
                     Adds a review to wine from a specific User. A specific user can't leave more
                      than one review of one kind of wine. If a review already exists, an earlier
-                     review with a rating is deleted, new adds.""")
+                     review with a rating is deleted, new adds. If there is no user with first 
+                     and last name, a new one is created. Users are compared by 
+                     first and last name. Available for all users.""")
     @PostMapping
     public ReviewWithUserDescriptionDto addReview(@RequestBody @Valid CreateReviewDto createDto) {
         return reviewService.addReviewV2(createDto);
@@ -46,7 +48,8 @@ public class ReviewController {
 
     @Operation(summary = "Find all reviews by wine id.",
             description = """
-                    Find all reviews by wine id, sort by reviewDate.DESC, size = 4, page = 0""")
+                    Find all reviews by wine id, sort by reviewDate.DESC, size = 4, page = 0. 
+                    Available for all users""")
     @GetMapping("/wine/{wineId}")
     public List<ReviewWithUserDescriptionDto> findAllReviewsByWineId(
             @PathVariable Long wineId,

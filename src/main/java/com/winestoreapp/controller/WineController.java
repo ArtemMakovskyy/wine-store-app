@@ -38,7 +38,7 @@ public class WineController {
     private final WineService wineService;
 
     @Operation(summary = "Find wine by id",
-            description = "Find existing wine by id")
+            description = "Find existing wine by id. Available for all users.")
     @GetMapping("/{id}")
     public WineDto findWineById(
             @PathVariable Long id) {
@@ -59,7 +59,7 @@ public class WineController {
             description = """
                     Find all wines. You can set pagination by: page, size, and sort parameters. 
                     By default, size = 4, page = 0, sort by 'averageRatingScore,DESC' 
-                    and after sort by 'id,ASC'""")
+                    and after sort by 'id,ASC'. Available for all users.""")
     @GetMapping
     public List<WineDto> findAllWines(
             @PageableDefault(

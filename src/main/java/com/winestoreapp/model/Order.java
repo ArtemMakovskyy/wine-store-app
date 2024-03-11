@@ -1,6 +1,5 @@
 package com.winestoreapp.model;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -30,7 +29,7 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "order_number",unique = true)
+    @Column(name = "order_number", unique = true)
     private String orderNumber;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -38,13 +37,11 @@ public class Order {
     private User user;
 
     @OneToOne(mappedBy = "order",
-            fetch = FetchType.LAZY,
-            cascade = CascadeType.ALL)
+            fetch = FetchType.LAZY)
     private ShoppingCard shoppingCard;
 
     @OneToOne(mappedBy = "order",
-            fetch = FetchType.LAZY,
-            cascade = CascadeType.ALL)
+            fetch = FetchType.LAZY)
     private OrderDeliveryInformation deliveryInformation;
 
     private LocalDateTime registrationTime;

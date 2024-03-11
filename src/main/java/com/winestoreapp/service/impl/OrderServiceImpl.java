@@ -3,7 +3,6 @@ package com.winestoreapp.service.impl;
 import com.winestoreapp.dto.mapper.OrderDeliveryInformationMapper;
 import com.winestoreapp.dto.mapper.OrderMapper;
 import com.winestoreapp.dto.order.CreateOrderDto;
-import com.winestoreapp.dto.order.CreateOrderOldDto;
 import com.winestoreapp.dto.order.OrderDto;
 import com.winestoreapp.dto.order.delivery.information.CreateOrderDeliveryInformationDto;
 import com.winestoreapp.dto.purchase.object.CreatePurchaseObjectDto;
@@ -57,21 +56,21 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final OrderMapper orderMapper;
 
-    @Override
-    @Transactional
-    public OrderDto createOldOrder(CreateOrderOldDto dto) {
-        Order order = new Order();
-        order.setUser(userRepository.findById(dto.getUserId()).orElseThrow(
-                () -> new EntityNotFoundException("Can't find user by id: " + dto.getUserId())));
-        order.setRegistrationTime(LocalDateTime.now());
-        order.setPaymentStatus(OrderPaymentStatus.PENDING);
-        order = orderRepository.save(order);
-        order.setDeliveryInformation(createOrderDeliveryInformation(
-                dto.getCreateOrderDeliveryInformationDto(), order));
-        order.setShoppingCard(createShoppingCard(
-                dto.getCreateShoppingCardDto(), order));
-        return orderMapper.toDto(order);
-    }
+    //    @Override
+    //    @Transactional
+    //    public OrderDto createOldOrder(CreateOrderOldDto dto) {
+    //        Order order = new Order();
+    //        order.setUser(userRepository.findById(dto.getUserId()).orElseThrow(
+    //                () -> new EntityNotFoundException("Can't find user by id: " + dto.getUserId())));
+    //        order.setRegistrationTime(LocalDateTime.now());
+    //        order.setPaymentStatus(OrderPaymentStatus.PENDING);
+    //        order = orderRepository.save(order);
+    //        order.setDeliveryInformation(createOrderDeliveryInformation(
+    //                dto.getCreateOrderDeliveryInformationDto(), order));
+    //        order.setShoppingCard(createShoppingCard(
+    //                dto.getCreateShoppingCardDto(), order));
+    //        return orderMapper.toDto(order);
+    //    }
 
     @Override
     @Transactional
@@ -85,6 +84,11 @@ public class OrderServiceImpl implements OrderService {
         if (userFirstAndLastName.length != WORD_QUANTITY) {
             throw new RegistrationException(
                     "You should enter your first and last name with a space between them");
+        }
+        for (CreatePurchaseObjectDto wine : dto.getCreateShoppingCardDto().getPurchaseObjects()) {
+            if (wineRepository.findById(wine.getWineId()).isEmpty()){
+                throw new EntityNotFoundException("Can't find wine by id " + wine.getWineId());
+            }
         }
         Order order = new Order();
         order.setUser(findOrUpdateOrSaveUser(

@@ -1,13 +1,12 @@
 package com.winestoreapp.service;
 
 import com.winestoreapp.dto.order.CreateOrderDto;
-import com.winestoreapp.dto.order.CreateOrderOldDto;
 import com.winestoreapp.dto.order.OrderDto;
 import java.util.List;
 import org.springframework.data.domain.Pageable;
 
 public interface OrderService {
-    OrderDto createOldOrder(CreateOrderOldDto dto);
+    //    OrderDto createOldOrder(CreateOrderOldDto dto);
 
     OrderDto createOrder(CreateOrderDto dto);
 
