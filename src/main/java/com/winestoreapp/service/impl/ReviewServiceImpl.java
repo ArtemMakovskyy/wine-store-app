@@ -1,15 +1,12 @@
 package com.winestoreapp.service.impl;
 
 import com.winestoreapp.dto.mapper.ReviewMapper;
-import com.winestoreapp.dto.review.CreateOldReviewDto;
 import com.winestoreapp.dto.review.CreateReviewDto;
-import com.winestoreapp.dto.review.ReviewDto;
 import com.winestoreapp.dto.review.ReviewWithUserDescriptionDto;
 import com.winestoreapp.exception.EmptyDataException;
 import com.winestoreapp.exception.RegistrationException;
 import com.winestoreapp.model.Review;
 import com.winestoreapp.model.User;
-import com.winestoreapp.model.Wine;
 import com.winestoreapp.repository.ReviewRepository;
 import com.winestoreapp.repository.UserRepository;
 import com.winestoreapp.repository.WineRepository;
@@ -39,7 +36,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     @Transactional
-    public ReviewWithUserDescriptionDto addReviewV2(CreateReviewDto createDto) {
+    public ReviewWithUserDescriptionDto addReview(CreateReviewDto createDto) {
         final String[] userFirstAndLastName
                 = createDto.getUserFirstAndLastName()
                 .strip()
@@ -76,25 +73,6 @@ public class ReviewServiceImpl implements ReviewService {
         final Review savedReview = reviewRepository.save(review);
         calculateWineAverageRatingScoreThenSave(createDto.getWineId());
         return reviewMapper.toUserDescriptionDto(savedReview);
-    }
-
-    @Override
-    @Transactional
-    public ReviewDto addReview(CreateOldReviewDto createDto) {
-        if (removeOutdatedReviews(createDto.getWineId(), createDto.getUserId())) {
-            log.info("into Outdated reviews were deleted");
-        }
-        Review review = reviewMapper.createDtoToEntity(createDto);
-        review.setReviewDate(LocalDateTime.now());
-        review.setUser(userRepository.findById(createDto.getUserId()).orElseThrow(
-                () -> new EmptyDataException("Can't get user by id " + createDto.getUserId())));
-        Wine wine = wineRepository.findById(createDto.getWineId()).orElseThrow(
-                () -> new EmptyDataException("Can't get wine by id " + createDto.getWineId()));
-        review.setWine(wine);
-        review.setReviewDate(LocalDateTime.now());
-        final ReviewDto reviewDto = reviewMapper.toDto(reviewRepository.save(review));
-        calculateWineAverageRatingScoreThenSave(createDto.getWineId());
-        return reviewDto;
     }
 
     @Override

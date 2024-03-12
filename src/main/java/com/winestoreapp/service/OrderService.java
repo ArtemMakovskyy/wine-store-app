@@ -6,7 +6,6 @@ import java.util.List;
 import org.springframework.data.domain.Pageable;
 
 public interface OrderService {
-    //    OrderDto createOldOrder(CreateOrderOldDto dto);
 
     OrderDto createOrder(CreateOrderDto dto);
 

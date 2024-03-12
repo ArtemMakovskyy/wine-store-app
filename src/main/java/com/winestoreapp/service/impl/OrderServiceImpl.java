@@ -55,22 +55,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrderDeliveryInformationRepository orderDeliveryInformationRepository;
     private final OrderRepository orderRepository;
     private final OrderMapper orderMapper;
-
-    //    @Override
-    //    @Transactional
-    //    public OrderDto createOldOrder(CreateOrderOldDto dto) {
-    //        Order order = new Order();
-    //        order.setUser(userRepository.findById(dto.getUserId()).orElseThrow(
-    //                () -> new EntityNotFoundException("Can't find user by id: " + dto.getUserId())));
-    //        order.setRegistrationTime(LocalDateTime.now());
-    //        order.setPaymentStatus(OrderPaymentStatus.PENDING);
-    //        order = orderRepository.save(order);
-    //        order.setDeliveryInformation(createOrderDeliveryInformation(
-    //                dto.getCreateOrderDeliveryInformationDto(), order));
-    //        order.setShoppingCard(createShoppingCard(
-    //                dto.getCreateShoppingCardDto(), order));
-    //        return orderMapper.toDto(order);
-    //    }
+    //    private final NotificationService notificationService;
 
     @Override
     @Transactional
@@ -86,7 +71,7 @@ public class OrderServiceImpl implements OrderService {
                     "You should enter your first and last name with a space between them");
         }
         for (CreatePurchaseObjectDto wine : dto.getCreateShoppingCardDto().getPurchaseObjects()) {
-            if (wineRepository.findById(wine.getWineId()).isEmpty()){
+            if (wineRepository.findById(wine.getWineId()).isEmpty()) {
                 throw new EntityNotFoundException("Can't find wine by id " + wine.getWineId());
             }
         }
@@ -103,6 +88,9 @@ public class OrderServiceImpl implements OrderService {
                 dto.getCreateOrderDeliveryInformationDto(), order));
         order.setShoppingCard(createShoppingCard(
                 dto.getCreateShoppingCardDto(), order));
+        //        notificationService.sendNotification(
+        //                "Your order: " + order.getOrderNumber()
+        //                        + " is created.", order.getUser().getTelegramChatId());
         return orderMapper.toDto(order);
     }
 
@@ -148,8 +136,14 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public boolean deleteById(Long id) {
-        if (orderRepository.existsById(id)) {
+        final Optional<Order> optionalOrderById = orderRepository.findById(id);
+        if (optionalOrderById.isPresent()) {
             orderRepository.deleteById(id);
+            final Order order = optionalOrderById.orElseThrow(
+                    () -> new EntityNotFoundException("Can't find order by id: " + id));
+            //            notificationService.sendNotification(
+            //                    "Your order: " + order.getOrderNumber() + " has been deleted.",
+            //                    order.getUser().getTelegramChatId());
             return true;
         }
         throw new EntityNotFoundException("Can't find Order by id: " + id);
@@ -158,8 +152,14 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public boolean updateOrderPaymentStatusAsPaidAndAddCurrentData(Long orderId) {
-        if (orderRepository.findById(orderId).isPresent()) {
+        final Optional<Order> optionalOrderById = orderRepository.findById(orderId);
+        if (optionalOrderById.isPresent()) {
             orderRepository.updateOrderPaymentStatusAsPaidAndSetCurrentDate(orderId);
+            final Order order = optionalOrderById.orElseThrow(
+                    () -> new EntityNotFoundException("Can't find order by id: " + orderId));
+            //            notificationService.sendNotification(
+            //                    "Your order: " + order.getOrderNumber() + " has been paid",
+            //                    order.getUser().getTelegramChatId());
             return true;
         }
         throw new EntityNotFoundException("Can't find order by id: " + orderId);

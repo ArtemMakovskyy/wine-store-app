@@ -35,6 +35,7 @@ public class UserServiceImpl implements UserService {
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setFirstName(request.getFirstName());
         user.setLastName(request.getLastName());
+        user.setPhoneNumber(request.getPhoneNumber());
         Role roleUser =
                 roleRepository.findById(3L).orElseThrow(
                         () -> new EntityNotFoundException("Can't find ROLE_CUSTOMER by id"));

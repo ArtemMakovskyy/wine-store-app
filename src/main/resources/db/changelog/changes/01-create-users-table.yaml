@@ -43,6 +43,8 @@ databaseChangeLog:
               - column:
                   name: telegram_chat_id
                   type: bigint
+                  constraints:
+                    unique: true
 
               - column:
                   name: is_deleted

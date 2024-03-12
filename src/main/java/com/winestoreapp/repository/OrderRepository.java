@@ -23,10 +23,12 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     @EntityGraph(attributePaths = {"shoppingCard.purchaseObjects.wine"})
     Page<Order> findAllByUserId(Long userId, Pageable pageable);
 
-    @EntityGraph(attributePaths = {"shoppingCard.purchaseObjects.wine"})
+    @EntityGraph(attributePaths = {"shoppingCard.purchaseObjects.wine", "user"})
     Optional<Order> findById(Long id);
 
     @EntityGraph(attributePaths = {"shoppingCard.purchaseObjects.wine"})
     Page<Order> findAll(Pageable pageable);
 
+    @EntityGraph(attributePaths = {"user"})
+    Optional<Order> findOrderByOrderNumber(String orderNumber);
 }

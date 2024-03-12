@@ -1,7 +1,6 @@
 package com.winestoreapp.service;
 
-import com.winestoreapp.dto.mapper.UserMapper;
-import com.winestoreapp.repository.RoleRepository;
+import com.winestoreapp.repository.OrderRepository;
 import com.winestoreapp.repository.UserRepository;
 import com.winestoreapp.service.impl.TelegramBotNotificationService;
 import lombok.Getter;
@@ -18,8 +17,7 @@ import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 public class TelegramBotStarter implements ApplicationRunner {
     private final TelegramBotCredentialProvider credentialProvider;
     private final UserRepository userRepository;
-    private final UserMapper userMapper;
-    private final RoleRepository roleRepository;
+    private final OrderRepository orderRepository;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
@@ -29,8 +27,7 @@ public class TelegramBotStarter implements ApplicationRunner {
                     new TelegramBotNotificationService(
                             credentialProvider,
                             userRepository,
-                            userMapper,
-                            roleRepository));
+                            orderRepository));
         } catch (TelegramApiException e) {
             throw new RuntimeException(e);
         }

@@ -29,11 +29,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class ReviewController {
     private final ReviewService reviewService;
 
-    //    @PostMapping("/old")
-    //    public ReviewDto addOldReview(@RequestBody @Valid CreateOldReviewDto createDto) {
-    //        return reviewService.addReview(createDto);
-    //    }
-
     @Operation(summary = "Add review to wine.",
             description = """
                     Adds a review to wine from a specific User. A specific user can't leave more
@@ -42,8 +37,9 @@ public class ReviewController {
                      and last name, a new one is created. Users are compared by 
                      first and last name. Available for all users.""")
     @PostMapping
-    public ReviewWithUserDescriptionDto addReview(@RequestBody @Valid CreateReviewDto createDto) {
-        return reviewService.addReviewV2(createDto);
+    public ReviewWithUserDescriptionDto addReview(
+            @RequestBody @Valid CreateReviewDto createDto) {
+        return reviewService.addReview(createDto);
     }
 
     @Operation(summary = "Find all reviews by wine id.",
@@ -59,4 +55,3 @@ public class ReviewController {
         return reviewService.findAllByWineId(wineId, pageable);
     }
 }
-

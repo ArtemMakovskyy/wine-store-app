@@ -48,6 +48,7 @@ public class User implements UserDetails {
     @Column(name = "phone_number")
     private String phoneNumber;
 
+    @Column(unique = true)
     private Long telegramChatId;
 
     @ManyToMany

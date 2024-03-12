@@ -42,3 +42,5 @@ build/
 /x.dockerignore
 /mvnw.cmd
 /mvnw
+/src/main/resources/static/pages/
+/src/main/resources/static/index.html
