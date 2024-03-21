@@ -25,8 +25,9 @@ public class UserRegistrationRequestDto {
     @NotBlank(message = "must be non blank")
     @Schema(example = "lastName")
     private String lastName;
-    @Size(min = 10, max = 10, message = "Phone number must be 10 digits. Like 0509876543")
-    @NotEmpty(message = "you should enter phone number like 0509876543")
+    @Size(min = 13, max = 13, message = "Phone number must be 13 symbols. Like +380509876543")
+    @NotEmpty(message = "you should enter phone number like +380509876543")
+    @Schema(example = "+380509876543")
     private String phoneNumber;
     @Size(min = 4, max = 20, message = "must be from 4 to 20 characters")
     @Schema(example = "password1234")

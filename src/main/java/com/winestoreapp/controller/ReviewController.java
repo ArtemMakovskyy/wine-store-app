@@ -43,10 +43,12 @@ public class ReviewController {
     }
 
     @Operation(summary = "Find all reviews by wine id.",
+            //todo explanation about pagination
             description = """
                     Find all reviews by wine id, sort by reviewDate.DESC, size = 4, page = 0. 
                     Available for all users""")
     @GetMapping("/wine/{wineId}")
+    //todo explanation about pagination
     public List<ReviewWithUserDescriptionDto> findAllReviewsByWineId(
             @PathVariable Long wineId,
             @PageableDefault(size = 4, page = 0, sort = {"reviewDate"},

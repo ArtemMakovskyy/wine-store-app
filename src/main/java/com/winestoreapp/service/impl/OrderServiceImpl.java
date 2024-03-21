@@ -79,7 +79,8 @@ public class OrderServiceImpl implements OrderService {
         order.setUser(findOrUpdateOrSaveUser(
                 userFirstAndLastName[USER_FIRST_NAME_INDEX],
                 userFirstAndLastName[USER_LAST_NAME_INDEX],
-                dto.getPhoneNumber()));
+                dto.getPhoneNumber(),
+                dto.getEmail()));
         order.setRegistrationTime(LocalDateTime.now());
         order.setPaymentStatus(OrderPaymentStatus.PENDING);
         order = orderRepository.save(order);
@@ -115,23 +116,30 @@ public class OrderServiceImpl implements OrderService {
     private User findOrUpdateOrSaveUser(
             String userFirstName,
             String userLastName,
-            String phoneNumber) {
+            String phoneNumber,
+            String email) {
 
-        final Optional<User> userByFirstNameAndLastNameAndPhoneNumber =
-                userRepository.findFirstByFirstNameAndLastNameAndPhoneNumber(
-                        userFirstName, userLastName, phoneNumber);
-        if (userByFirstNameAndLastNameAndPhoneNumber.isPresent()) {
-            return userByFirstNameAndLastNameAndPhoneNumber.get();
+        final Optional<User> userByEmail = userRepository.findUserByEmail(email);
+        if (userByEmail.isPresent()) {
+            return userByEmail.get();
         }
+
+        //                final Optional<User> userByFirstNameAndLastNameAndPhoneNumber =
+        //                        userRepository.findFirstByFirstNameAndLastNameAndPhoneNumber(
+        //                                userFirstName, userLastName, phoneNumber);
+        //                if (userByFirstNameAndLastNameAndPhoneNumber.isPresent()) {
+        //                    return userByFirstNameAndLastNameAndPhoneNumber.get();
+        //                }
 
         final Optional<User> userByFirstNameAndLastName
                 = userRepository.findFirstByFirstNameAndLastName(userFirstName, userLastName);
         if (userByFirstNameAndLastName.isPresent()) {
             final User user = userByFirstNameAndLastName.get();
             user.setPhoneNumber(phoneNumber);
+            user.setEmail(email);
             return userRepository.save(user);
         }
-        return userRepository.save(new User(userFirstName, userLastName, phoneNumber));
+        return userRepository.save(new User(email, userFirstName, userLastName, phoneNumber));
     }
 
     @Override

@@ -37,6 +37,7 @@ public class OrderController {
                     Find all orders. Use size, page and sort for pagination. 
                     Available for all users""")
     @GetMapping
+    //todo explanation about pagination
     public List<OrderDto> findAllOrders(Pageable pageable) {
         return orderService.findAll(pageable);
     }
@@ -46,17 +47,12 @@ public class OrderController {
                     Find all orders by user ID. Use size, page and sort for pagination. 
                     Available for all users""")
     @GetMapping("/users/{userId}")
+    //todo explanation about pagination
     public List<OrderDto> findAllOrdersByUserId(
             @PathVariable Long userId,
             Pageable pageable) {
         return orderService.findAllByUserId(userId, pageable);
     }
-
-    //    @ResponseStatus(HttpStatus.CREATED)
-    //    @PostMapping("/old")
-    //    public OrderDto addOldOrder(@RequestBody @Valid CreateOrderOldDto dto) {
-    //        return orderService.createOldOrder(dto);
-    //    }
 
     @Operation(summary = "Add new order",
             description = """

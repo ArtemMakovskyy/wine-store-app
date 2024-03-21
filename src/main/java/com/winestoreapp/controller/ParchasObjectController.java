@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
         RequestMethod.PATCH, RequestMethod.DELETE})
 public class ParchasObjectController {
 
+    //todo DELETE this controller
     private final PurchaseObjectRepository repository;
     private final PurchaseObjectMapper purchaseObjectMapper;
     private final ShoppingCardRepository shoppingCardRepository;
