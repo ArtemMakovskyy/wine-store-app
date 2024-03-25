@@ -33,8 +33,8 @@ public class ReviewController {
             description = """
                     Adds a review to wine from a specific User. A specific user can't leave more
                      than one review of one kind of wine. If a review already exists, an earlier
-                     review with a rating is deleted, new adds. If there is no user with first 
-                     and last name, a new one is created. Users are compared by 
+                     review with a rating is deleted, new adds. If there is no user with first
+                     and last name, a new one is created. Users are compared by
                      first and last name. Available for all users.""")
     @PostMapping
     public ReviewWithUserDescriptionDto addReview(
@@ -43,12 +43,11 @@ public class ReviewController {
     }
 
     @Operation(summary = "Find all reviews by wine id.",
-            //todo explanation about pagination
             description = """
-                    Find all reviews by wine id, sort by reviewDate.DESC, size = 4, page = 0. 
+                    Find all reviews by wine id, sort by reviewDate.DESC, size = 4, page = 0.
+                    Pagination example: /reviews/wine/{wineId}?size=5&page=0&sort=id
                     Available for all users""")
-    @GetMapping("/wine/{wineId}")
-    //todo explanation about pagination
+    @GetMapping("/wines/{wineId}")
     public List<ReviewWithUserDescriptionDto> findAllReviewsByWineId(
             @PathVariable Long wineId,
             @PageableDefault(size = 4, page = 0, sort = {"reviewDate"},

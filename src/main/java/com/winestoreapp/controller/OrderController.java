@@ -34,20 +34,20 @@ public class OrderController {
 
     @Operation(summary = "Find all orders",
             description = """
-                    Find all orders. Use size, page and sort for pagination. 
+                    Find all orders. Use size, page and sort for pagination.
+                    Pagination example: /orders?size=5&page=0&sort=id
                     Available for all users""")
     @GetMapping
-    //todo explanation about pagination
     public List<OrderDto> findAllOrders(Pageable pageable) {
         return orderService.findAll(pageable);
     }
 
     @Operation(summary = "Find all orders by user ID",
             description = """
-                    Find all orders by user ID. Use size, page and sort for pagination. 
+                    Find all orders by user ID. Use size, page and sort for pagination.
+                    Pagination example: /orders/users/{userId}?size=5&page=0&sort=id
                     Available for all users""")
     @GetMapping("/users/{userId}")
-    //todo explanation about pagination
     public List<OrderDto> findAllOrdersByUserId(
             @PathVariable Long userId,
             Pageable pageable) {

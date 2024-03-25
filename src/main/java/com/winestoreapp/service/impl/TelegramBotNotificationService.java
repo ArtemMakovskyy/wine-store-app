@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
@@ -24,7 +26,8 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 @Slf4j
-//@Component
+@Component
+@ConditionalOnProperty(name = "telegram.bot.enabled", havingValue = "true", matchIfMissing = true)
 @RequiredArgsConstructor
 public class TelegramBotNotificationService
         extends TelegramLongPollingBot
@@ -196,12 +199,6 @@ public class TelegramBotNotificationService
                 1. /start: for starting application.
                 2. /help: displays a list of functions.
                 3. /exit: Log out. """;
-
-        //        if (userRepository.findByTelegramChatId(chatId).isEmpty()) {
-        //            sendInnerMessageToChat(chatId, helpMessage, getRegisterButtons());
-        //        } else {
-        //            sendInnerMessageToChat(chatId, helpMessage, getWorkButtons());
-        //        }
         sendInnerMessageToChat(chatId, helpMessage, getMainButtons());
     }
 
@@ -281,22 +278,6 @@ public class TelegramBotNotificationService
         } catch (TelegramApiException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private ReplyKeyboardMarkup getRegisterButtons() {
-        KeyboardRow loginLineButtons = new KeyboardRow();
-        loginLineButtons.add("Select wine by color");
-        loginLineButtons.add("Main menu");
-        loginLineButtons.add("Help");
-
-        List<KeyboardRow> keyboardRows = new ArrayList<>();
-        keyboardRows.add(loginLineButtons);
-
-        ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
-        keyboardMarkup.setKeyboard(keyboardRows);
-        keyboardMarkup.setResizeKeyboard(true);
-        keyboardMarkup.setOneTimeKeyboard(false);
-        return keyboardMarkup;
     }
 
     private void sendPicture(Long chatId) {

@@ -22,6 +22,7 @@ import com.winestoreapp.repository.PurchaseObjectRepository;
 import com.winestoreapp.repository.ShoppingCardRepository;
 import com.winestoreapp.repository.UserRepository;
 import com.winestoreapp.repository.WineRepository;
+import com.winestoreapp.service.NotificationService;
 import com.winestoreapp.service.OrderService;
 import jakarta.transaction.Transactional;
 import java.math.BigDecimal;
@@ -32,7 +33,10 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -46,7 +50,11 @@ public class OrderServiceImpl implements OrderService {
     private static final int NUMBER_RANDOM_CHARACTERS = 3;
     private static final int NUMBER_OF_LETTERS_IN_THE_ENGLISH_ALPHABET = 26;
     private static final int WORD_QUANTITY = 2;
-
+    @Value("${telegram.bot.enabled}")
+    private boolean telegramBotEnable;
+    @Autowired(required = false)
+    @Nullable
+    private final NotificationService notificationService;
     private final PurchaseObjectRepository purchaseObjectRepository;
     private final ShoppingCardRepository shoppingCardRepository;
     private final WineRepository wineRepository;
@@ -55,12 +63,10 @@ public class OrderServiceImpl implements OrderService {
     private final OrderDeliveryInformationRepository orderDeliveryInformationRepository;
     private final OrderRepository orderRepository;
     private final OrderMapper orderMapper;
-    //    private final NotificationService notificationService;
 
     @Override
     @Transactional
     public OrderDto createOrder(CreateOrderDto dto) {
-        //todo create number of order
         final String[] userFirstAndLastName
                 = dto.getUserFirstAndLastName()
                 .strip()
@@ -89,9 +95,11 @@ public class OrderServiceImpl implements OrderService {
                 dto.getCreateOrderDeliveryInformationDto(), order));
         order.setShoppingCard(createShoppingCard(
                 dto.getCreateShoppingCardDto(), order));
-        //        notificationService.sendNotification(
-        //                "Your order: " + order.getOrderNumber()
-        //                        + " is created.", order.getUser().getTelegramChatId());
+        if (telegramBotEnable) {
+            notificationService.sendNotification(
+                    "Your order: " + order.getOrderNumber()
+                            + " is created.", order.getUser().getTelegramChatId());
+        }
         return orderMapper.toDto(order);
     }
 
@@ -102,46 +110,6 @@ public class OrderServiceImpl implements OrderService {
         return orderMapper.toDto(order);
     }
 
-    private String generateRandomLetters(Long orderId) {
-        Random random = new Random();
-        StringBuilder result = new StringBuilder(ORDER_IDENTIFIER);
-        for (int i = 0; i < NUMBER_RANDOM_CHARACTERS; i++) {
-            char randomLetter = (char)
-                    ('A' + random.nextInt(NUMBER_OF_LETTERS_IN_THE_ENGLISH_ALPHABET));
-            result.append(randomLetter);
-        }
-        return result.append(orderId).toString();
-    }
-
-    private User findOrUpdateOrSaveUser(
-            String userFirstName,
-            String userLastName,
-            String phoneNumber,
-            String email) {
-
-        final Optional<User> userByEmail = userRepository.findUserByEmail(email);
-        if (userByEmail.isPresent()) {
-            return userByEmail.get();
-        }
-
-        //                final Optional<User> userByFirstNameAndLastNameAndPhoneNumber =
-        //                        userRepository.findFirstByFirstNameAndLastNameAndPhoneNumber(
-        //                                userFirstName, userLastName, phoneNumber);
-        //                if (userByFirstNameAndLastNameAndPhoneNumber.isPresent()) {
-        //                    return userByFirstNameAndLastNameAndPhoneNumber.get();
-        //                }
-
-        final Optional<User> userByFirstNameAndLastName
-                = userRepository.findFirstByFirstNameAndLastName(userFirstName, userLastName);
-        if (userByFirstNameAndLastName.isPresent()) {
-            final User user = userByFirstNameAndLastName.get();
-            user.setPhoneNumber(phoneNumber);
-            user.setEmail(email);
-            return userRepository.save(user);
-        }
-        return userRepository.save(new User(email, userFirstName, userLastName, phoneNumber));
-    }
-
     @Override
     public boolean deleteById(Long id) {
         final Optional<Order> optionalOrderById = orderRepository.findById(id);
@@ -149,9 +117,11 @@ public class OrderServiceImpl implements OrderService {
             orderRepository.deleteById(id);
             final Order order = optionalOrderById.orElseThrow(
                     () -> new EntityNotFoundException("Can't find order by id: " + id));
-            //            notificationService.sendNotification(
-            //                    "Your order: " + order.getOrderNumber() + " has been deleted.",
-            //                    order.getUser().getTelegramChatId());
+            if (telegramBotEnable) {
+                notificationService.sendNotification(
+                        "Your order: " + order.getOrderNumber() + " has been deleted.",
+                        order.getUser().getTelegramChatId());
+            }
             return true;
         }
         throw new EntityNotFoundException("Can't find Order by id: " + id);
@@ -165,9 +135,11 @@ public class OrderServiceImpl implements OrderService {
             orderRepository.updateOrderPaymentStatusAsPaidAndSetCurrentDate(orderId);
             final Order order = optionalOrderById.orElseThrow(
                     () -> new EntityNotFoundException("Can't find order by id: " + orderId));
-            //            notificationService.sendNotification(
-            //                    "Your order: " + order.getOrderNumber() + " has been paid",
-            //                    order.getUser().getTelegramChatId());
+            if (telegramBotEnable) {
+                notificationService.sendNotification(
+                        "Your order: " + order.getOrderNumber() + " has been paid",
+                        order.getUser().getTelegramChatId());
+            }
             return true;
         }
         throw new EntityNotFoundException("Can't find order by id: " + orderId);
@@ -182,9 +154,23 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<OrderDto> findAllByUserId(Long userId, Pageable pageable) {
-        return orderRepository.findAllByUserId(userId, pageable)
-                .map(orderMapper::toDto)
-                .toList();
+        if (userRepository.existsById(userId)) {
+            return orderRepository.findAllByUserId(userId, pageable)
+                    .map(orderMapper::toDto)
+                    .toList();
+        }
+        throw new EntityNotFoundException("Can't find user by id " + userId);
+    }
+
+    private String generateRandomLetters(Long orderId) {
+        Random random = new Random();
+        StringBuilder result = new StringBuilder(ORDER_IDENTIFIER);
+        for (int i = 0; i < NUMBER_RANDOM_CHARACTERS; i++) {
+            char randomLetter = (char)
+                    ('A' + random.nextInt(NUMBER_OF_LETTERS_IN_THE_ENGLISH_ALPHABET));
+            result.append(randomLetter);
+        }
+        return result.append(orderId).toString();
     }
 
     private ShoppingCard createShoppingCard(CreateShoppingCardDto dto, Order order) {
@@ -224,5 +210,27 @@ public class OrderServiceImpl implements OrderService {
                 = orderDeliveryInformationMapper.toEntity(dto);
         orderDeliveryInformation.setOrder(order);
         return orderDeliveryInformationRepository.save(orderDeliveryInformation);
+    }
+
+    private User findOrUpdateOrSaveUser(
+            String userFirstName,
+            String userLastName,
+            String phoneNumber,
+            String email) {
+
+        final Optional<User> findUserByEmail = userRepository.findUserByEmail(email);
+        if (findUserByEmail.isPresent()) {
+            return findUserByEmail.get();
+        }
+
+        final Optional<User> findUserByFirstNameAndLastName
+                = userRepository.findFirstByFirstNameAndLastName(userFirstName, userLastName);
+        if (findUserByFirstNameAndLastName.isPresent()) {
+            final User user = findUserByFirstNameAndLastName.get();
+            user.setPhoneNumber(phoneNumber);
+            user.setEmail(email);
+            return userRepository.save(user);
+        }
+        return userRepository.save(new User(email, userFirstName, userLastName, phoneNumber));
     }
 }

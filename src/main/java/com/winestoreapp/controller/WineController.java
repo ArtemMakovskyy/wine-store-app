@@ -59,9 +59,10 @@ public class WineController {
             description = """
                     Find all wines. You can set pagination by: page, size, and sort parameters. 
                     By default, size = 20, page = 0, sort by 'averageRatingScore,DESC' 
-                    and after sort by 'id,DESC'. Available for all users.""")
+                    and after sort by 'id,DESC'. 
+                    Pagination example: /wines?size=5&page=0&sort=id
+                    Available for all users.""")
     @GetMapping
-    //todo explanation about pagination
     public List<WineDto> findAllWines(
             @PageableDefault(
                     size = 20,

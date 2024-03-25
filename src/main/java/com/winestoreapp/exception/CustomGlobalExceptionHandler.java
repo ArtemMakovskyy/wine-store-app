@@ -45,7 +45,6 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
         return e.getDefaultMessage();
     }
 
-    // TODO: 11.02.2024 не срабатывает
     @ExceptionHandler(value = {EntityNotFoundException.class})
     protected ResponseEntity<Object> handleEntityNotFoundException(
             EntityNotFoundException ex,

@@ -12,7 +12,6 @@ import com.winestoreapp.service.WineService;
 import jakarta.annotation.PostConstruct;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -20,7 +19,6 @@ import java.nio.file.StandardCopyOption;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -33,16 +31,11 @@ public class WineServiceImpl implements WineService {
     private static final String IMAGE_SAVE_PATH = "src/main/resources/static/images/wine/";
     private final WineRepository wineRepository;
     private final WineMapper wineMapper;
-    // TODO: 07.02.2024 dell it if not use
-    @Value("${hosting.url}")
-    private URL hostingUrl;
 
     @Override
     public WineDto add(WineCreateRequestDto createDto) {
         final Wine wine = wineMapper.toEntity(createDto);
-        // TODO: 06.02.2024 checkImageForLoading think about saving link
         final Wine savedWine = wineRepository.save(wine);
-        // TODO: 06.02.2024 save file
         return wineMapper.toDto(savedWine);
     }
 
