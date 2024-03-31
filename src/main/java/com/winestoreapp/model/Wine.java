@@ -44,6 +44,12 @@ public class Wine {
     @Column(name = "short_name")
     private String shortName;
 
+    @Column(nullable = false)
+    private Integer year;
+
+    @Column(name = "taste_wine")
+    private String tasteWine;
+
     @OneToMany(mappedBy = "wine")
     private Set<Review> reviews;
 
@@ -79,9 +85,7 @@ public class Wine {
     private String aroma;
     private String gastronomy;
     private String description;
-
     private String pictureLink;
-
     private String pictureLink2;
 
     @Column(name = "is_deleted", nullable = false)

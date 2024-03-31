@@ -10,11 +10,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface UserRepository extends JpaRepository<User, Long> {
-    //    @Query("FROM User u LEFT JOIN FETCH u.roles r WHERE u.email =
-    //    :email AND u.isDeleted = FALSE "
-    //            + "AND r.isDeleted = FALSE")
-    //    Optional<User> findUserByEmail(String email);
-
     @EntityGraph(attributePaths = {"roles"})
     Optional<User> findUserByEmail(String email);
 
@@ -22,9 +17,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findById(Long id);
 
     Optional<User> findFirstByFirstNameAndLastName(String firstName, String lastName);
-
-    Optional<User> findFirstByFirstNameAndLastNameAndPhoneNumber(
-            String firstName, String lastName, String phoneNumber);
 
     Optional<User> findUserByTelegramChatId(Long telegramChatId);
 

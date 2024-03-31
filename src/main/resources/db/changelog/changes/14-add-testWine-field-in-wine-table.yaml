@@ -1,0 +1,11 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-testWine-field-in-wine-table
+      author: artemmakovskyy
+      changes:
+        - addColumn:
+            tableName: wines
+            columns:
+              - column:
+                  name: taste_wine
+                  type: varchar(255)

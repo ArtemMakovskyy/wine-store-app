@@ -1,0 +1,13 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-year-field-in-wine-table
+      author: artemmakovskyy
+      changes:
+        - addColumn:
+            tableName: wines
+            columns:
+              - column:
+                  name: year
+                  type: integer
+                  constraints:
+                    nullable: false

@@ -13,9 +13,11 @@ public class WineDto {
     private String reserveType;
     private String name;
     private String shortName;
+    private Integer year;
+    private String grape;
+    private String tasteWine;
     private BigDecimal averageRatingScore;
     private BigDecimal price;
-    private String grape;
     private Boolean isDecantation;
     private WineType wineType;
     private BigDecimal strengthFrom;

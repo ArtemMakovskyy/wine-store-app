@@ -23,6 +23,10 @@ public class WineCreateRequestDto {
     private String name;
     @Schema(example = "Prince Trubetskoi")
     private String shortName;
+    @Schema(example = "2017")
+    private Integer year;
+    @Schema(example = "fish")
+    private String tasteWine;
     @Schema(example = "25.59")
     private BigDecimal price;
     @Schema(example = "Riesling")
@@ -47,8 +51,8 @@ public class WineCreateRequestDto {
     private String gastronomy;
     @Schema(example = "description")
     private String description;
-    @Schema(example = "LINK")
+    @Schema(example = "Fill this link if you already have file into drive")
     private String pictureLink;
-    @Schema(example = "LINK2")
+    @Schema(example = "Fill this link if you already have file into drive")
     private String pictureLink2;
 }

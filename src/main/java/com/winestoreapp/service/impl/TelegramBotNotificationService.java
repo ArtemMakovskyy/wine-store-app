@@ -33,14 +33,26 @@ public class TelegramBotNotificationService
         extends TelegramLongPollingBot
         implements NotificationService {
     private static final String STORE_ADDRESS = """
-            Street name, 8
-            Phone number: +38050 123 4578
+            ADDRESS: Vesele, Kherson District, Ukraine, 74344
+            PHONE: +38 067 678 32 88
+            E-MAIL: prince.trubettskoy@gmail.com
+            WEB-SITE: https://wine-site-project.vercel.app/
                         """;
     private static final String ORDER_MARKER = "ORDER_";
     private static final int MINIMUM_ORDER_LENGTH = 10;
     private static final String PATH_TO_IMAGE
             = "src/main/resources/static/images/telegram/wine_avatar.jpg";
     private static final String WINE_AVATAR_FILE_NAME = "wine_avatar.jpg";
+    private static final String MAIN_FRONT_END_URL
+            = "https://wine-site-project.vercel.app/#";
+    private static final String RED_DRY_WINES_LINK
+            = "/products?color=RED&type=DRY";
+    private static final String RED_SEMI_DRY_RED_WINES_LINK
+            = "/products?color=RED&type=SEMI-DRY";
+    private static final String WHITE_DRY_WHITE_WINES_LINK
+            = "/products?color=WHITE&type=DRY";
+    private static final String WHITE_SEMI_DRY_WHITE_WINES_LINK
+            = "/products?color=WHITE&type=SEMI-DRY";
     private final TelegramBotCredentialProvider telegramBotCredentialProvider;
     private final UserRepository userRepository;
     private final OrderRepository orderRepository;
@@ -66,12 +78,22 @@ public class TelegramBotNotificationService
                     executingTheStartCommand(
                             userChatId, update.getMessage().getChat().getFirstName());
                 }
-                case "/contacts", "Contacts" -> executingTheContactsCommand(userChatId);
+                case "/contacts", "Contacts"
+                        -> executingTheContactsCommand(userChatId);
                 case "/wine_selection", "Select wine by color"
                         -> executingTheWineColorSelectionCommand(userChatId);
-                case "/help", "Help" -> executingHelpCommand(userChatId);
-                case "/red_wine", "Red wine" -> executingRedWineCommand(userChatId);
-                case "/white_wine", "White wine" -> executingWhiteWineCommand(userChatId);
+                case "/red_wine", "Red wine"
+                        -> executingRedWineCommand(userChatId);
+                case "/white_wine", "White wine"
+                        -> executingWhiteWineCommand(userChatId);
+                case "/dry_red_whine", "Dry red whine"
+                        -> executingGetDryRedWhineLinkCommand(userChatId);
+                case "/semi-dry_red_whine", "Semi-dry red whine"
+                        -> executingGetSemiDryRedWhineLinkCommand(userChatId);
+                case "/dry_white_whine", "Dry white whine"
+                        -> executingGetDryWhiteWhineLinkCommand(userChatId);
+                case "/semi-dry_white_whine", "Semi-dry white whine" ->
+                        executingGetSemiDryWhiteWhineLinkCommand(userChatId);
                 default -> processTextMessage(userChatId, textFromUSer, update);
             }
         }
@@ -110,16 +132,20 @@ public class TelegramBotNotificationService
     }
 
     private void sendMessageFromUserToManager(Long chatId, String messageFromUser, Update update) {
-        final List<User> usersByRole = userRepository.findUsersByRole(RoleName.ROLE_MANAGER);
+        final List<User> usersByRole
+                = userRepository.findUsersByRole(RoleName.ROLE_MANAGER).stream()
+                .filter(user -> user.getTelegramChatId() != null).toList();
         if (usersByRole.isEmpty()) {
             String message = "Unfortunately there are no managers at the moment. Write"
                     + " a message later.";
             sendInnerMessageToChat(chatId, message, getMainButtons());
             log.info(message);
         } else {
+
             sendInnerMessageToChat(
                     getManagerTelegramChatId(usersByRole),
-                    messageFromUser + createTelegramLinkToUser(update),
+                    "Question from user is: " + messageFromUser
+                            + createTelegramLinkToUser(update),
                     getMainButtons());
             sendInnerMessageToChat(
                     chatId,
@@ -137,7 +163,7 @@ public class TelegramBotNotificationService
     }
 
     private String createTelegramLinkToUser(Update update) {
-        return "Link to user: @" + update.getMessage().getFrom().getUserName();
+        return ". \nLink to user: @" + update.getMessage().getFrom().getUserName();
     }
 
     private void userRegisterByOrderNumber(Long chatId, String orderNumber) {
@@ -190,33 +216,20 @@ public class TelegramBotNotificationService
     }
 
     private void executingTheWineColorSelectionCommand(Long chatId) {
-        sendInnerMessageToChat(chatId, "Wine colors:", getWineColourButtons());
-    }
-
-    private void executingHelpCommand(Long chatId) {
-        String helpMessage = """
-                Chat bot features:
-                1. /start: for starting application.
-                2. /help: displays a list of functions.
-                3. /exit: Log out. """;
-        sendInnerMessageToChat(chatId, helpMessage, getMainButtons());
-    }
-
-    private void executingRedWineCommand(Long chatId) {
-        sendInnerMessageToChat(chatId, "Red wines:", getRedWineButtons(chatId));
-    }
-
-    private void executingWhiteWineCommand(Long chatId) {
-        sendInnerMessageToChat(chatId, "White wines:", getRedWineButtons(chatId));
+        sendInnerMessageToChat(chatId, "Select wine color:", getWineColourButtons());
     }
 
     private ReplyKeyboardMarkup getWineColourButtons() {
-        KeyboardRow firstRow = new KeyboardRow();
-        firstRow.add("Red wine");
-        firstRow.add("White wine");
+        KeyboardRow row1 = new KeyboardRow();
+        row1.add("Red wine");
+        row1.add("White wine");
+
+        KeyboardRow row2 = new KeyboardRow();
+        row2.add("Main menu");
 
         List<KeyboardRow> keyboardRows = new ArrayList<>();
-        keyboardRows.add(firstRow);
+        keyboardRows.add(row1);
+        keyboardRows.add(row2);
 
         ReplyKeyboardMarkup markup = new ReplyKeyboardMarkup();
         markup.setSelective(true);
@@ -226,33 +239,17 @@ public class TelegramBotNotificationService
         return markup;
     }
 
-    private ReplyKeyboardMarkup getMainButtons() {
-        KeyboardRow firstRow = new KeyboardRow();
-        firstRow.add("Contacts");
-        firstRow.add("Main menu");
-        KeyboardRow secondRow = new KeyboardRow();
-        secondRow.add("Select wine by color");
-        secondRow.add("Help");
-
-        List<KeyboardRow> keyboardRows = new ArrayList<>();
-        keyboardRows.add(firstRow);
-        keyboardRows.add(secondRow);
-
-        ReplyKeyboardMarkup markup = new ReplyKeyboardMarkup();
-        markup.setResizeKeyboard(true);
-        markup.setOneTimeKeyboard(false);
-        markup.setKeyboard(keyboardRows);
-        return markup;
+    private void executingRedWineCommand(Long chatId) {
+        sendInnerMessageToChat(chatId, "Select red wine type:", getRedWineButtons(chatId));
     }
 
     private ReplyKeyboardMarkup getRedWineButtons(Long chatId) {
         KeyboardRow row1 = new KeyboardRow();
-        row1.add("fortified white");
-        row1.add("sweet white");
-        row1.add("semi-sweet white");
+        row1.add("Dry red whine");
+        row1.add("Semi-dry red whine");
+
         KeyboardRow row2 = new KeyboardRow();
-        row2.add("semi-dry white");
-        row2.add("dry white");
+        row2.add("Main menu");
 
         List<KeyboardRow> keyboardRows = new ArrayList<>();
         keyboardRows.add(row1);
@@ -263,6 +260,49 @@ public class TelegramBotNotificationService
         keyboardMarkup.setResizeKeyboard(true);
         keyboardMarkup.setKeyboard(keyboardRows);
         return keyboardMarkup;
+    }
+
+    private void executingGetDryRedWhineLinkCommand(Long chatId) {
+        sendInnerMessageToChat(chatId, "Use the link to view dry red wines: "
+                + MAIN_FRONT_END_URL + RED_DRY_WINES_LINK, getMainButtons());
+    }
+
+    private void executingGetSemiDryRedWhineLinkCommand(Long chatId) {
+        sendInnerMessageToChat(chatId, "Use the link to view Semi-dry red whines: "
+                + MAIN_FRONT_END_URL + RED_SEMI_DRY_RED_WINES_LINK, getMainButtons());
+    }
+
+    private void executingWhiteWineCommand(Long chatId) {
+        sendInnerMessageToChat(chatId, "Select white wine type:", getWhiteWineButtons(chatId));
+    }
+
+    private ReplyKeyboardMarkup getWhiteWineButtons(Long chatId) {
+        KeyboardRow row1 = new KeyboardRow();
+        row1.add("Dry white whine");
+        row1.add("Semi-dry white whine");
+
+        KeyboardRow row2 = new KeyboardRow();
+        row2.add("Main menu");
+
+        List<KeyboardRow> keyboardRows = new ArrayList<>();
+        keyboardRows.add(row1);
+        keyboardRows.add(row2);
+
+        ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
+        keyboardMarkup.setOneTimeKeyboard(false);
+        keyboardMarkup.setResizeKeyboard(true);
+        keyboardMarkup.setKeyboard(keyboardRows);
+        return keyboardMarkup;
+    }
+
+    private void executingGetDryWhiteWhineLinkCommand(Long chatId) {
+        sendInnerMessageToChat(chatId, "Use the link to view dry white wines: "
+                + MAIN_FRONT_END_URL + WHITE_DRY_WHITE_WINES_LINK, getMainButtons());
+    }
+
+    private void executingGetSemiDryWhiteWhineLinkCommand(Long chatId) {
+        sendInnerMessageToChat(chatId, "Use the link to view Semi-dry white whines: "
+                + MAIN_FRONT_END_URL + WHITE_SEMI_DRY_WHITE_WINES_LINK, getMainButtons());
     }
 
     private void sendInnerMessageToChat(
@@ -291,5 +331,23 @@ public class TelegramBotNotificationService
         } catch (Exception e) {
             log.error("Error sending pictures in Telegram", e);
         }
+    }
+
+    private ReplyKeyboardMarkup getMainButtons() {
+        KeyboardRow firstRow = new KeyboardRow();
+        firstRow.add("Contacts");
+        firstRow.add("Main menu");
+        KeyboardRow secondRow = new KeyboardRow();
+        secondRow.add("Select wine by color");
+
+        List<KeyboardRow> keyboardRows = new ArrayList<>();
+        keyboardRows.add(firstRow);
+        keyboardRows.add(secondRow);
+
+        ReplyKeyboardMarkup markup = new ReplyKeyboardMarkup();
+        markup.setResizeKeyboard(true);
+        markup.setOneTimeKeyboard(false);
+        markup.setKeyboard(keyboardRows);
+        return markup;
     }
 }

@@ -10,11 +10,8 @@ import org.mapstruct.ReportingPolicy;
 @Mapper(config = MapperConfig.class, unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface PurchaseObjectMapper {
 
-    //    CreatePurchaseObjectDto toDto(PurchaseObject purchaseObject);
-
     @Mapping(target = "wineId", source = "purchaseObject.wine.id")
     @Mapping(target = "winePictureLink", source = "purchaseObject.wine.pictureLink")
     @Mapping(target = "wineName", source = "purchaseObject.wine.name")
     PurchaseObjectDto toDto(PurchaseObject purchaseObject);
-
 }

@@ -23,8 +23,7 @@ databaseChangeLog:
       file: db/changelog/changes/11-create-purchase-objects-table.yaml
   - include:
       file: db/changelog/changes/12-changes-in-wine-table.yaml
-
-
-
-
-
+  - include:
+      file: db/changelog/changes/13-add-year-field-in-wine-table.yaml
+  - include:
+      file: db/changelog/changes/14-add-testWine-field-in-wine-table.yaml
