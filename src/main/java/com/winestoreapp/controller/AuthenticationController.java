@@ -31,8 +31,8 @@ public class AuthenticationController {
     private final AuthenticationService authenticationService;
 
     @Operation(summary = "Registration of a new user.",
-            description = "Save your: email, password,first name, "
-                    + "last name")
+            description = "Save your: email, password, first name, "
+                    + "last name and phone number")
     @PostMapping("/register")
     public UserResponseDto registerUser(@RequestBody @Valid UserRegistrationRequestDto requestDto)
             throws RegistrationException {

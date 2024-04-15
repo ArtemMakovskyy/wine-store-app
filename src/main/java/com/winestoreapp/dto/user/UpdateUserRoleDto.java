@@ -6,7 +6,9 @@ import jakarta.validation.constraints.NotBlank;
 
 public record UpdateUserRoleDto(
         @ValidUserRole
-        @NotBlank(message = "Role should not be blank")
-        @Schema(example = "ROLE_CUSTOMER | ROLE_MANAGER | ROLE_ADMIN")
+        @NotBlank(message = """
+                Role should not be blank.
+                Available roles: ROLE_CUSTOMER, ROLE_MANAGER, ROLE_ADMIN.""")
+        @Schema(example = "ROLE_MANAGER")
         String role) {
 }

@@ -58,7 +58,7 @@ public class WineController {
     @Operation(summary = "Find all wines",
             description = """
                     Find all wines. You can set pagination by: page, size, and sort parameters. 
-                    By default, page = 0, sort by 'averageRatingScore,DESC' 
+                    By default, size 50, page = 0, sort by 'averageRatingScore,DESC' 
                     and after sort by 'id,DESC'. 
                     Pagination example: /wines?size=5&page=0&sort=id
                     Available for all users.""")
@@ -66,6 +66,7 @@ public class WineController {
     public List<WineDto> findAllWines(
             @PageableDefault(
                     page = 0,
+                    size = 50,
                     sort = {"averageRatingScore", "id"},
                     direction = Sort.Direction.DESC)
             Pageable pageable) {
@@ -85,7 +86,9 @@ public class WineController {
 
     @PreAuthorize("hasRole('ROLE_MANAGER')")
     @Operation(summary = "Add an image into path.",
-            description = "Add an image into path. Available for manager12345@gmail.com")
+            description = """
+    Add an image into path. Available for manager12345@gmail.com.
+    After you add or change photos, you will have to restart the app to view the changes.""")
     @PatchMapping("/{id}/image")
     @ResponseStatus(HttpStatus.OK)
     public WineDto addImageByIdIntoPath(

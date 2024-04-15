@@ -29,7 +29,9 @@ public class UserController {
     @PutMapping("/{id}/role")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
     @Operation(summary = "Update user role by user id",
-            description = "Update user role by user identification number. Only for ADMIN")
+            description = """
+                    Update user role by user identification number. Only for ADMIN.
+                    Available roles: ROLE_CUSTOMER, ROLE_MANAGER, ROLE_ADMIN.""")
     public UserResponseDto updateUserRole(
             @PathVariable Long id,
             @RequestBody @Valid UpdateUserRoleDto roleDto) {
