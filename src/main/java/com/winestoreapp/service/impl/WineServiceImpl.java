@@ -56,6 +56,29 @@ public class WineServiceImpl implements WineService {
         return wineMapper.toDto(wineRepository.save(wineFromDb));
     }
 
+    @Override
+    public List<WineDto> findAll(Pageable pageable) {
+        return wineRepository.findAll(pageable).stream()
+                .map(wineMapper::toDto)
+                .toList();
+    }
+
+    @Override
+    public WineDto findById(Long id) {
+        return wineMapper.toDto(wineRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Can't find wine by id: " + id)));
+    }
+
+    @Override
+    public boolean isDeleteById(Long id) {
+        if (!wineRepository.existsById(id)) {
+            throw new EntityNotFoundException("Can't find wine by id: " + id);
+        }
+        wineRepository.deleteById(id);
+        return true;
+    }
+
     private String saveImage(Wine wine, MultipartFile image, String uniqueIdentificationSymbol) {
         try {
             Path uploadPath = Path.of(IMAGE_SAVE_PATH);
@@ -108,28 +131,5 @@ public class WineServiceImpl implements WineService {
                 fileName.length() - CHARACTERS_LENGTH_CONTAINING_EXTENSION);
         return originalFileNameWithoutExtension
                 + uniqueIdentification + System.currentTimeMillis() + fileExtension;
-    }
-
-    @Override
-    public List<WineDto> findAll(Pageable pageable) {
-        return wineRepository.findAll(pageable).stream()
-                .map(wineMapper::toDto)
-                .toList();
-    }
-
-    @Override
-    public WineDto findById(Long id) {
-        return wineMapper.toDto(wineRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(
-                        "Can't find wine by id: " + id)));
-    }
-
-    @Override
-    public boolean isDeleteById(Long id) {
-        if (!wineRepository.existsById(id)) {
-            throw new EntityNotFoundException("Can't find wine by id: " + id);
-        }
-        wineRepository.deleteById(id);
-        return true;
     }
 }
