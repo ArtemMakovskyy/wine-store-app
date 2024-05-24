@@ -62,7 +62,7 @@ public class UserServiceImpl implements UserService {
                 && usersByRoleAdminInDb.size() == MINIMUM_ALLOWED_NUMBER_OF_ADMIN_USERS) {
             throw new RegistrationException("You cannot change the last admin role in the "
                     + "database. After the change, at least one user with the admin role "
-                    + "have to remain.");
+                    + "has to remain.");
         }
         userFromDb.setRoles(Set.of(roleFromDb));
         return userMapper.toDto(userRepository.save(userFromDb));

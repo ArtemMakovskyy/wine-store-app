@@ -38,6 +38,15 @@ public class TelegramBotNotificationService
             E-MAIL: prince.trubettskoy@gmail.com
             WEB-SITE: https://wine-site-project.vercel.app/
                         """;
+    private static final String GREETING_MESSAGE = """
+            , welcome to the Wine Store Bot😀❕
+                            
+                 🔆Tips:🔆
+              ✔️ You can enter your order number to register. After you will get 
+              information about the state of your orders.
+              ✔️ You can ask a question to the manager and get an answer soon.
+              ✔️ You can use the buttons to receive information from our telegram bot.
+            """;
     private static final String ORDER_MARKER = "ORDER_";
     private static final int MINIMUM_ORDER_LENGTH = 10;
     private static final String PATH_TO_IMAGE
@@ -87,7 +96,7 @@ public class TelegramBotNotificationService
                 case "/white_wine", "White wine"
                         -> executingWhiteWineCommand(userChatId);
                 case "/dry_red_whine", "Dry red whine"
-                        -> executingGetDryRedWhineLinkCommand(userChatId);
+                        -> executingGetDryRedWineLinkCommand(userChatId);
                 case "/semi-dry_red_whine", "Semi-dry red whine"
                         -> executingGetSemiDryRedWhineLinkCommand(userChatId);
                 case "/dry_white_whine", "Dry white whine"
@@ -110,15 +119,7 @@ public class TelegramBotNotificationService
     }
 
     private void executingTheStartCommand(Long chatId, String firstName) {
-        String message = firstName + """
-                , welcome to the Wine Store Bot😀❕
-                                
-                     🔆Tips:🔆
-                  ✔️ You can enter your order number to register. After you will get 
-                  information about the state of your orders.
-                  ✔️ You can ask a question to the manager and get an answer soon.
-                  ✔️ You can use the buttons to receive information from our telegram bot.
-                """;
+        String message = firstName + GREETING_MESSAGE;
         sendInnerMessageToChat(chatId, message, getMainButtons());
     }
 
@@ -262,7 +263,7 @@ public class TelegramBotNotificationService
         return keyboardMarkup;
     }
 
-    private void executingGetDryRedWhineLinkCommand(Long chatId) {
+    private void executingGetDryRedWineLinkCommand(Long chatId) {
         sendInnerMessageToChat(chatId, "Use the link to view dry red wines: "
                 + MAIN_FRONT_END_URL + RED_DRY_WINES_LINK, getMainButtons());
     }

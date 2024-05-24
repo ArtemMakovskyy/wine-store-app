@@ -8,7 +8,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface WineService {
-
     WineDto add(WineCreateRequestDto createDto);
 
     List<WineDto> findAll(Pageable pageable);

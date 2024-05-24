@@ -14,7 +14,6 @@ import com.winestoreapp.service.ReviewService;
 import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -45,19 +44,13 @@ public class ReviewServiceImpl implements ReviewService {
             throw new RegistrationException(
                     "You should enter your first and last name with a space between them");
         }
-        final Optional<User> foundUserByFirstNameAndLastName
-                = userRepository.findFirstByFirstNameAndLastName(
+        User user = userRepository.findFirstByFirstNameAndLastName(
                 userFirstAndLastName[USER_FIRST_NAME_INDEX],
-                userFirstAndLastName[USER_LAST_NAME_INDEX]);
-
-        User user = null;
-        if (foundUserByFirstNameAndLastName.isEmpty()) {
-            user = userRepository.save(
-                    new User(userFirstAndLastName[USER_FIRST_NAME_INDEX],
-                            userFirstAndLastName[USER_LAST_NAME_INDEX]));
-        }
-
-        user = foundUserByFirstNameAndLastName.orElse(user);
+                userFirstAndLastName[USER_LAST_NAME_INDEX]
+        ).orElseGet(() -> userRepository.save(new User(
+                userFirstAndLastName[USER_FIRST_NAME_INDEX],
+                userFirstAndLastName[USER_LAST_NAME_INDEX]
+        )));
 
         if (removeOutdatedReviews(createDto.getWineId(), user.getId())) {
             log.info("into Outdated reviews were deleted");
@@ -83,13 +76,11 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     private boolean removeOutdatedReviews(Long wineId, Long userId) {
-        final List<Review> allByWineIdAndUserId
+        final List<Review> reviews
                 = reviewRepository.findAllByWineIdAndUserId(
                 wineId, userId);
-        if (!allByWineIdAndUserId.isEmpty()) {
-            for (Review review : allByWineIdAndUserId) {
-                reviewRepository.deleteById(review.getId());
-            }
+        if (!reviews.isEmpty()) {
+            reviews.forEach(review -> reviewRepository.deleteById(review.getId()));
         }
         return true;
     }

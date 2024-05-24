@@ -43,8 +43,7 @@ public class WineServiceImpl implements WineService {
 
     @Override
     public WineDto updateImage(Long id, MultipartFile imageA, MultipartFile imageB) {
-        Wine wineFromDb = wineRepository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException("Can't find wine by id " + id));
+        Wine wineFromDb = findWineById(id);
 
         final String imageNameA = saveImage(wineFromDb, imageA, IDENTIFIER_FOR_FIRST_IMAGE);
         final String imageNameB = saveImage(wineFromDb, imageB, IDENTIFIER_FOR_SECOND_IMAGE);
@@ -65,18 +64,23 @@ public class WineServiceImpl implements WineService {
 
     @Override
     public WineDto findById(Long id) {
-        return wineMapper.toDto(wineRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(
-                        "Can't find wine by id: " + id)));
+        return wineMapper.toDto(findWineById(id));
     }
 
     @Override
     public boolean isDeleteById(Long id) {
         if (!wineRepository.existsById(id)) {
-            throw new EntityNotFoundException("Can't find wine by id: " + id);
+            throw new EntityNotFoundException(
+                    "Can't find wine by id: " + id);
         }
         wineRepository.deleteById(id);
         return true;
+    }
+
+    private Wine findWineById(Long id) {
+        return wineRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Can't find wine by id: " + id));
     }
 
     private String saveImage(Wine wine, MultipartFile image, String uniqueIdentificationSymbol) {

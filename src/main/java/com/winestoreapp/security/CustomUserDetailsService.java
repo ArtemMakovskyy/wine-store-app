@@ -1,5 +1,6 @@
 package com.winestoreapp.security;
 
+import com.winestoreapp.exception.EntityNotFoundException;
 import com.winestoreapp.model.User;
 import com.winestoreapp.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +17,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         final User user = userRepository.findUserByEmail(username)
-                .orElseThrow(() -> new RuntimeException("Can't find user be email "));
+                .orElseThrow(() -> new EntityNotFoundException("Can't find user be email "));
         return user;
     }
 }

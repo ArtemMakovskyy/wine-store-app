@@ -114,9 +114,10 @@ public class OrderServiceImpl implements OrderService {
     public boolean deleteById(Long id) {
         final Optional<Order> optionalOrderById = orderRepository.findById(id);
         if (optionalOrderById.isPresent()) {
+            Order order = optionalOrderById.get();
+
             orderRepository.deleteById(id);
-            final Order order = optionalOrderById.orElseThrow(
-                    () -> new EntityNotFoundException("Can't find order by id: " + id));
+
             if (telegramBotEnable) {
                 notificationService.sendNotification(
                         "Your order: " + order.getOrderNumber() + " has been deleted.",
@@ -132,9 +133,10 @@ public class OrderServiceImpl implements OrderService {
     public boolean updateOrderPaymentStatusAsPaidAndAddCurrentData(Long orderId) {
         final Optional<Order> optionalOrderById = orderRepository.findById(orderId);
         if (optionalOrderById.isPresent()) {
+            Order order = optionalOrderById.get();
+
             orderRepository.updateOrderPaymentStatusAsPaidAndSetCurrentDate(orderId);
-            final Order order = optionalOrderById.orElseThrow(
-                    () -> new EntityNotFoundException("Can't find order by id: " + orderId));
+
             if (telegramBotEnable) {
                 notificationService.sendNotification(
                         "Your order: " + order.getOrderNumber() + " has been paid",
@@ -218,19 +220,15 @@ public class OrderServiceImpl implements OrderService {
             String phoneNumber,
             String email) {
 
-        final Optional<User> findUserByEmail = userRepository.findUserByEmail(email);
-        if (findUserByEmail.isPresent()) {
-            return findUserByEmail.get();
-        }
-
-        final Optional<User> findUserByFirstNameAndLastName
-                = userRepository.findFirstByFirstNameAndLastName(userFirstName, userLastName);
-        if (findUserByFirstNameAndLastName.isPresent()) {
-            final User user = findUserByFirstNameAndLastName.get();
-            user.setPhoneNumber(phoneNumber);
-            user.setEmail(email);
-            return userRepository.save(user);
-        }
-        return userRepository.save(new User(email, userFirstName, userLastName, phoneNumber));
+        return userRepository.findUserByEmail(email)
+                .or(() -> userRepository.findFirstByFirstNameAndLastName(
+                        userFirstName, userLastName))
+                .map(user -> {
+                    user.setPhoneNumber(phoneNumber);
+                    user.setEmail(email);
+                    return userRepository.save(user);
+                })
+                .orElseGet(() -> userRepository.save(new User(
+                        email, userFirstName, userLastName, phoneNumber)));
     }
 }

@@ -20,7 +20,6 @@ import org.hibernate.annotations.Where;
 @SQLDelete(sql = "UPDATE roles SET is_deleted = true WHERE id=?")
 @Where(clause = "is_deleted=false")
 public class Role {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
