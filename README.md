@@ -220,7 +220,7 @@ With the Wine Store API, you can:
 - **Instalation**
     - Clone the repository from github:
   ```shell
-  git clone git@github.com:https://github.com/ArtemMakovskyy/wine-store-app.git
+  git clone https://github.com/ArtemMakovskyy/wine-store-app.git
    ```
     - Start the Docker
     - Configure the database parameters in the .env file if it need.
