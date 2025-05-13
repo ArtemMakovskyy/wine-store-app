@@ -222,10 +222,11 @@ With the Wine Store API, you can:
   ```shell
   git clone https://github.com/ArtemMakovskyy/wine-store-app.git
    ```
-    - Start the Docker
-    - Configure the database parameters in the .env file if it need.
-    - Open a terminal and navigate to the root directory of your project
-    - Into the terminal use command to build the container and start project.
+    - Start Docker
+    - Rename file .env.sample to .env
+    - Configure the database parameters in the .env file if needed.
+    - Open a terminal and navigate to the root directory of your project.
+    - In the terminal, use a command to build the container and start the project.
   ```shell
     docker-compose up
    ```
