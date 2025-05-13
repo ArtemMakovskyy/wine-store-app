@@ -214,10 +214,7 @@ With the Wine Store API, you can:
 ### ▶️How to set up and start the project
 
 - **Soft requirements**
-    - Java Development Kit (JDK) version 11 or higher.
-    - Maven Version: 4.0.0
     - Git
-    - MySQL
     - Docker
     - PostMan
 - **Instalation**
@@ -226,11 +223,10 @@ With the Wine Store API, you can:
   git clone git@github.com:https://github.com/ArtemMakovskyy/wine-store-app.git
    ```
     - Start the Docker
-    - Configure the database parameters in the .env file
+    - Configure the database parameters in the .env file if it need.
     - Open a terminal and navigate to the root directory of your project
     - Into the terminal use command to build the container and start project.
   ```shell
-    docker-compose build
     docker-compose up
    ```
     - First way to use the WINE STORE API it is SWAGGER
@@ -239,6 +235,4 @@ With the Wine Store API, you can:
      http://localhost:8080/api/swagger-ui/index.html#/
    ```
     - Second way to use the WINE STORE API it is PostMan
-
 ---
-
