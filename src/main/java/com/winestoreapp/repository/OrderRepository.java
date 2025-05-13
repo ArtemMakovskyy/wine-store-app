@@ -1,6 +1,7 @@
 package com.winestoreapp.repository;
 
 import com.winestoreapp.model.Order;
+import io.micrometer.observation.annotation.Observed;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -10,6 +11,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+@Observed
 public interface OrderRepository extends JpaRepository<Order, Long> {
     @Modifying
     @Query("""
