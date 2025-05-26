@@ -25,48 +25,66 @@ With the Wine Store API, you can:
 
 ---
 
-### 🖥️Technologies and tools used
+### 🖥️ Technologies and tools used
 
-- Programming Language: Java (version 17)
-- Application Framework: Spring Boot (version 3.1.2)
-- Dependency Management: Apache Maven
-- REST
-- Security
-    - Spring Security
-    - JSON Web Tokens (JWT)
-- Spring Data JPA
-- Spring MVC
-- JSON Libraries:
-    - Jackson Data Type for JSR310 (for handling dates in JSON)
-    - Telegrambots (version 6.8.0) for Telegram integration
-- Validation Libraries:
-    - Spring Boot Starter Validation
-    - Hibernate Validator (part of Spring Boot Starter Validation)
-- Authentication and Security Libraries:
-    - Spring Boot Starter Security
-    - Spring Security Test (for security testing)
-- Database Libraries:
-    - Spring Boot Starter Data JPA
-    - H2 Database (temporary database for development)
-    - MySQL Connector (driver for MySQL)
-- Database Migration Libraries:
-    - Liquibase Core
-    - Liquibase Migration Maven Plugin (version 4.23.1)
-- Testing Libraries:
-    - JUnit Jupiter
-    - Testcontainers (for containerized testing)
-    - Mockito
-- API Documentation Tools:
-    - Springdoc OpenAPI Starter Webmvc UI (version 2.1.0)
-- JWT Processing Libraries:
-    - jjwt-api
-    - jjwt-impl (included in runtime scope)
-    - jjwt-jackson (included in runtime scope)
-- Additional Tools and Libraries:
-    - Lombok (for reducing boilerplate code)
-    - MapStruct (for convenient object mapping)
-    - Spring Boot DevTools (for development convenience)
-    - Maven Checkstyle Plugin (for code style checking)
+- **Programming Language**: Java (version 17)
+- **Application Framework**: Spring Boot (version 3.1.2)
+- **Dependency Management**: Apache Maven
+- **REST**
+- **Security**
+  - Spring Security
+  - JSON Web Tokens (JWT)
+- **Spring Data JPA**
+- **Spring MVC**
+- **JSON Libraries**:
+  - Jackson Data Type for JSR310 (for handling dates in JSON)
+  - Telegrambots (version 6.8.0) for Telegram integration
+- **Validation Libraries**:
+  - Spring Boot Starter Validation
+  - Hibernate Validator (part of Spring Boot Starter Validation)
+- **Authentication and Security Libraries**:
+  - Spring Boot Starter Security
+  - Spring Security Test (for security testing)
+- **Database Libraries**:
+  - Spring Boot Starter Data JPA
+  - H2 Database (temporary database for development)
+  - MySQL Connector (driver for MySQL)
+- **Database Migration Libraries**:
+  - Liquibase Core
+  - Liquibase Migration Maven Plugin (version 4.23.1)
+- **Testing Libraries**:
+  - JUnit Jupiter
+  - Testcontainers (for containerized testing)
+  - Mockito
+- **API Documentation Tools**:
+  - Springdoc OpenAPI Starter Webmvc UI (version 2.1.0)
+- **JWT Processing Libraries**:
+  - jjwt-api
+  - jjwt-impl (included in runtime scope)
+  - jjwt-jackson (included in runtime scope)
+- **Additional Tools and Libraries**:
+  - Lombok (for reducing boilerplate code)
+  - MapStruct (for convenient object mapping)
+  - Spring Boot DevTools (for development convenience)
+  - Maven Checkstyle Plugin (for code style checking)
+
+---
+
+### 🛠️ Observability
+
+- **Logging**
+  - SLF4J (Simple Logging Facade for Java)
+  - Logback (default Spring Boot logging backend)
+- **Metrics and Monitoring**
+  - Micrometer (for application metrics)
+  - Spring Boot Actuator (for exposing operational information)
+- **Distributed Tracing**
+  - OpenTelemetry SDK (for tracing)
+  - Zipkin (for visualizing traces)
+- **Visualization and Aggregation**
+  - Prometheus (for scraping and storing metrics)
+  - Grafana (for metrics dashboards)
+
 
 ---
 
@@ -237,3 +255,41 @@ With the Wine Store API, you can:
    ```
     - Second way to use the WINE STORE API it is PostMan
 ---
+
+# Observability
+
+The project implements an observability system that enables real-time monitoring of metrics, logs, and traces. This allows for effective issue detection, performance analysis, and debugging.
+
+## 🔧 Tools and Technologies Used
+
+| Component                | Purpose |
+|--------------------------|---------|
+| **Spring Boot Actuator** | Exposes technical endpoints for gathering application state information |
+| **Micrometer + Prometheus** | Collects metrics (CPU usage, memory, HTTP requests, etc.) |
+| **Grafana** | Builds dashboards and visualizes metrics |
+| **Loki** | Aggregates and displays logs from the Java application via Grafana |
+| **Tempo** | Collects traces (distributed tracing) for request analysis across components |
+| **Zipkin Brave** | A tracing tool (Zipkin format) with Tempo support |
+| **Loki Logback Appender** | Sends logs from Spring Boot to Loki via Logback |
+
+## 🚀 How to Use
+
+### Open Grafana:
+- URL: [http://localhost:3000](http://localhost:3000)
+- By default, anonymous access is enabled with administrator privileges.
+
+### Metrics:
+1. Navigate to **Metrics → Prometheus**.
+2. View relevant metrics such as:
+  - `http_server_requests_seconds_count`
+  - `jvm_memory_used_bytes`
+
+### Logs:
+1. Go to **Explore → Loki**.
+2. Filter logs using queries:
+  - `{app="wine-store-api"}`
+  - `{level="ERROR"}`
+
+### Traces:
+1. Open **Traces → Tempo**.
+2. Select a service and inspect the request path for **end-to-end tracing**.
