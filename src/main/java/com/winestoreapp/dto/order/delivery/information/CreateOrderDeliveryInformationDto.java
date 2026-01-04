@@ -1,8 +1,8 @@
 package com.winestoreapp.dto.order.delivery.information;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @Data
 public class CreateOrderDeliveryInformationDto {

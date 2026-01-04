@@ -22,28 +22,22 @@ import org.hibernate.annotations.Where;
 @Where(clause = "is_deleted=false")
 @NoArgsConstructor
 public class Review {
+    @Column(nullable = false)
+    private final boolean isDeleted = false;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "wine_id", nullable = false)
     private Wine wine;
-
     private String message;
-
     @Column(nullable = false)
     private int rating;
-
     @Column(nullable = false)
     private LocalDateTime reviewDate;
-
-    @Column(nullable = false)
-    private boolean isDeleted = false;
 
     public Review(User user, Wine wine, String message, int rating) {
         if (user == null || wine == null) {

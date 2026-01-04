@@ -1,12 +1,12 @@
 package com.winestoreapp.repository;
 
 import com.winestoreapp.model.Review;
-import io.micrometer.observation.annotation.Observed;
 import java.util.List;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import io.micrometer.observation.annotation.Observed;
 
 @Observed
 public interface ReviewRepository extends JpaRepository<Review, Long> {

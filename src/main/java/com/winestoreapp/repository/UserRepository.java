@@ -2,13 +2,13 @@ package com.winestoreapp.repository;
 
 import com.winestoreapp.model.RoleName;
 import com.winestoreapp.model.User;
-import io.micrometer.observation.annotation.Observed;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import io.micrometer.observation.annotation.Observed;
 
 @Observed
 public interface UserRepository extends JpaRepository<User, Long> {

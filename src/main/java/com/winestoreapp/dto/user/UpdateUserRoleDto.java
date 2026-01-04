@@ -1,8 +1,8 @@
 package com.winestoreapp.dto.user;
 
 import com.winestoreapp.validation.ValidUserRole;
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 public record UpdateUserRoleDto(
         @ValidUserRole

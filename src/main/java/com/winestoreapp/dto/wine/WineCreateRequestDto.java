@@ -2,11 +2,11 @@ package com.winestoreapp.dto.wine;
 
 import com.winestoreapp.model.WineColor;
 import com.winestoreapp.model.WineType;
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import java.math.BigDecimal;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @Data
 @AllArgsConstructor

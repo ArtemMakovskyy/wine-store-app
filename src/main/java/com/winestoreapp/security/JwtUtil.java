@@ -1,10 +1,5 @@
 package com.winestoreapp.security;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.time.LocalDateTime;
@@ -15,13 +10,18 @@ import java.util.function.Function;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
 
 @Component
 public class JwtUtil {
     private static final Long MILLISECONDS_IN_DAY = 8_6400_000L;
     private static final Map<String, LocalDateTime> INVALID_TOKENS = new ConcurrentHashMap<>();
     private static final String EVERY_DAY_AT_MIDNIGHT = "0 0 0 * * *";
-    private Key secret;
+    private final Key secret;
     @Value("${jwt.expiration:1000}")
     private long expiration;
 

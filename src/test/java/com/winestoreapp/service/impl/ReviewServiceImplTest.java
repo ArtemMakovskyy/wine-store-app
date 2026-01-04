@@ -1,14 +1,5 @@
 package com.winestoreapp.service.impl;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyDouble;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import com.winestoreapp.dto.mapper.ReviewMapper;
 import com.winestoreapp.dto.review.CreateReviewDto;
 import com.winestoreapp.dto.review.ReviewDto;
@@ -16,13 +7,10 @@ import com.winestoreapp.dto.review.ReviewWithUserDescriptionDto;
 import com.winestoreapp.model.Review;
 import com.winestoreapp.model.User;
 import com.winestoreapp.model.Wine;
-import com.winestoreapp.model.WineColor;
-import com.winestoreapp.model.WineType;
 import com.winestoreapp.repository.ReviewRepository;
 import com.winestoreapp.repository.UserRepository;
 import com.winestoreapp.repository.WineRepository;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -32,6 +20,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyDouble;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ReviewServiceImplTest {

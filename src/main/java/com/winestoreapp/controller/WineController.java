@@ -3,8 +3,6 @@ package com.winestoreapp.controller;
 import com.winestoreapp.dto.wine.WineCreateRequestDto;
 import com.winestoreapp.dto.wine.WineDto;
 import com.winestoreapp.service.WineService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.MalformedURLException;
 import java.util.List;
@@ -27,6 +25,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @Tag(name = "Wine management", description = "Endpoints to managing wines")
 @RestController
@@ -41,7 +41,8 @@ public class WineController {
             description = "Find existing wine by id. Available for all users.")
     @GetMapping("/{id}")
     public WineDto findWineById(
-            @PathVariable Long id) {
+            @PathVariable Long id
+    ) {
         return wineService.findById(id);
     }
 
@@ -51,7 +52,8 @@ public class WineController {
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public boolean deleteWineById(
-            @PathVariable Long id) {
+            @PathVariable Long id
+    ) {
         return wineService.isDeleteById(id);
     }
 
@@ -69,7 +71,8 @@ public class WineController {
                     size = 50,
                     sort = {"averageRatingScore", "id"},
                     direction = Sort.Direction.DESC)
-            Pageable pageable) {
+            Pageable pageable
+    ) {
         return wineService.findAll(pageable);
     }
 
@@ -80,15 +83,16 @@ public class WineController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public WineDto createWine(
-            @RequestBody @Valid WineCreateRequestDto createDto) {
+            @RequestBody @Valid WineCreateRequestDto createDto
+    ) {
         return wineService.add(createDto);
     }
 
     @PreAuthorize("hasRole('ROLE_MANAGER')")
     @Operation(summary = "Add an image into path.",
             description = """
-    Add an image into path. Available for manager12345@gmail.com.
-    After you add or change photos, you will have to restart the app to view the changes.""")
+                    Add an image into path. Available for manager12345@gmail.com.
+                    After you add or change photos, you will have to restart the app to view the changes.""")
     @PatchMapping("/{id}/image")
     @ResponseStatus(HttpStatus.OK)
     public WineDto addImageByIdIntoPath(

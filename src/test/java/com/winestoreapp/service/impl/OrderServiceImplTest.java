@@ -1,23 +1,26 @@
 package com.winestoreapp.service.impl;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.*;
-
 import com.winestoreapp.dto.mapper.OrderDeliveryInformationMapper;
 import com.winestoreapp.dto.mapper.OrderMapper;
 import com.winestoreapp.dto.order.CreateOrderDto;
 import com.winestoreapp.dto.order.OrderDto;
 import com.winestoreapp.dto.order.delivery.information.CreateOrderDeliveryInformationDto;
-import com.winestoreapp.dto.order.delivery.information.OrderDeliveryInformationDto;
 import com.winestoreapp.dto.purchase.object.CreatePurchaseObjectDto;
 import com.winestoreapp.dto.shopping.card.CreateShoppingCardDto;
-import com.winestoreapp.dto.shopping.card.ShoppingCardDto;
-import com.winestoreapp.model.*;
-import com.winestoreapp.repository.*;
+import com.winestoreapp.model.Order;
+import com.winestoreapp.model.OrderDeliveryInformation;
+import com.winestoreapp.model.OrderPaymentStatus;
+import com.winestoreapp.model.PurchaseObject;
+import com.winestoreapp.model.ShoppingCard;
+import com.winestoreapp.model.User;
+import com.winestoreapp.model.Wine;
+import com.winestoreapp.repository.OrderDeliveryInformationRepository;
+import com.winestoreapp.repository.OrderRepository;
+import com.winestoreapp.repository.PurchaseObjectRepository;
+import com.winestoreapp.repository.ShoppingCardRepository;
+import com.winestoreapp.repository.UserRepository;
+import com.winestoreapp.repository.WineRepository;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.DisplayName;
@@ -26,23 +29,38 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyLong;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class OrderServiceImplTest {
-    @Mock private WineRepository wineRepository;
-    @Mock private OrderMapper orderMapper;
-    @Mock private OrderRepository orderRepository;
-    @Mock private UserRepository userRepository;
-    @Mock private PurchaseObjectRepository purchaseObjectRepository;
-    @Mock private OrderDeliveryInformationMapper orderDeliveryInformationMapper;
-    @Mock private OrderDeliveryInformationRepository orderDeliveryInformationRepository;
-    @Mock private ShoppingCardRepository shoppingCardRepository;
+    @Mock
+    private WineRepository wineRepository;
+    @Mock
+    private OrderMapper orderMapper;
+    @Mock
+    private OrderRepository orderRepository;
+    @Mock
+    private UserRepository userRepository;
+    @Mock
+    private PurchaseObjectRepository purchaseObjectRepository;
+    @Mock
+    private OrderDeliveryInformationMapper orderDeliveryInformationMapper;
+    @Mock
+    private OrderDeliveryInformationRepository orderDeliveryInformationRepository;
+    @Mock
+    private ShoppingCardRepository shoppingCardRepository;
 
-    @InjectMocks private OrderServiceImpl orderService;
+    @InjectMocks
+    private OrderServiceImpl orderService;
 
     @Test
     @DisplayName("Add order by valid data and return OrderDto")

@@ -3,8 +3,6 @@ package com.winestoreapp.controller;
 import com.winestoreapp.dto.order.CreateOrderDto;
 import com.winestoreapp.dto.order.OrderDto;
 import com.winestoreapp.service.OrderService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +20,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @Tag(name = "Order management", description = "Endpoints to managing orders")
 @RestController
@@ -50,7 +50,8 @@ public class OrderController {
     @GetMapping("/users/{userId}")
     public List<OrderDto> findAllOrdersByUserId(
             @PathVariable Long userId,
-            Pageable pageable) {
+            Pageable pageable
+    ) {
         return orderService.findAllByUserId(userId, pageable);
     }
 

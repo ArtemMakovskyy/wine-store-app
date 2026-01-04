@@ -1,10 +1,5 @@
 package com.winestoreapp.service.impl;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.*;
-
 import com.winestoreapp.dto.mapper.UserMapper;
 import com.winestoreapp.dto.user.UserRegistrationRequestDto;
 import com.winestoreapp.dto.user.UserResponseDto;
@@ -28,14 +23,25 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 @ExtendWith(MockitoExtension.class)
 class UserServiceImplTest {
-    @Mock private UserRepository userRepository;
-    @Mock private RoleRepository roleRepository;
-    @Mock private PasswordEncoder passwordEncoder;
-    @Mock private UserMapper userMapper;
+    @Mock
+    private UserRepository userRepository;
+    @Mock
+    private RoleRepository roleRepository;
+    @Mock
+    private PasswordEncoder passwordEncoder;
+    @Mock
+    private UserMapper userMapper;
 
-    @InjectMocks private UserServiceImpl userService;
+    @InjectMocks
+    private UserServiceImpl userService;
 
     @Test
     @DisplayName("New user registration with valid data, Return UserResponseDto")

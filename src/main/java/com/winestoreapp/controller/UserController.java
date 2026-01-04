@@ -3,8 +3,6 @@ package com.winestoreapp.controller;
 import com.winestoreapp.dto.user.UpdateUserRoleDto;
 import com.winestoreapp.dto.user.UserResponseDto;
 import com.winestoreapp.service.UserService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -15,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @Tag(name = "User management",
         description = "Endpoints for managing users")
@@ -34,7 +34,8 @@ public class UserController {
                     Available roles: ROLE_CUSTOMER, ROLE_MANAGER, ROLE_ADMIN.""")
     public UserResponseDto updateUserRole(
             @PathVariable Long id,
-            @RequestBody @Valid UpdateUserRoleDto roleDto) {
+            @RequestBody @Valid UpdateUserRoleDto roleDto
+    ) {
         return userService.updateRole(id, roleDto.role());
     }
 }

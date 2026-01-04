@@ -2,9 +2,9 @@ package com.winestoreapp.dto.order;
 
 import com.winestoreapp.dto.order.delivery.information.CreateOrderDeliveryInformationDto;
 import com.winestoreapp.dto.shopping.card.CreateShoppingCardDto;
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @Data
 public class CreateOrderOldDto {

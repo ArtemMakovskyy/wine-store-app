@@ -37,10 +37,10 @@ public class TelegramBotNotificationService
             PHONE: +38 067 678 32 88
             E-MAIL: prince.trubettskoy@gmail.com
             WEB-SITE: https://wine-site-project.vercel.app/
-                        """;
+            """;
     private static final String GREETING_MESSAGE = """
             , welcome to the Wine Store Bot😀❕
-                            
+            
                  🔆Tips:🔆
               ✔️ You can enter your order number to register. After you will get 
               information about the state of your orders.
@@ -87,20 +87,20 @@ public class TelegramBotNotificationService
                     executingTheStartCommand(
                             userChatId, update.getMessage().getChat().getFirstName());
                 }
-                case "/contacts", "Contacts"
-                        -> executingTheContactsCommand(userChatId);
-                case "/wine_selection", "Select wine by color"
-                        -> executingTheWineColorSelectionCommand(userChatId);
-                case "/red_wine", "Red wine"
-                        -> executingRedWineCommand(userChatId);
-                case "/white_wine", "White wine"
-                        -> executingWhiteWineCommand(userChatId);
-                case "/dry_red_whine", "Dry red whine"
-                        -> executingGetDryRedWineLinkCommand(userChatId);
-                case "/semi-dry_red_whine", "Semi-dry red whine"
-                        -> executingGetSemiDryRedWhineLinkCommand(userChatId);
-                case "/dry_white_whine", "Dry white whine"
-                        -> executingGetDryWhiteWhineLinkCommand(userChatId);
+                case "/contacts", "Contacts" ->
+                        executingTheContactsCommand(userChatId);
+                case "/wine_selection", "Select wine by color" ->
+                        executingTheWineColorSelectionCommand(userChatId);
+                case "/red_wine", "Red wine" ->
+                        executingRedWineCommand(userChatId);
+                case "/white_wine", "White wine" ->
+                        executingWhiteWineCommand(userChatId);
+                case "/dry_red_whine", "Dry red whine" ->
+                        executingGetDryRedWineLinkCommand(userChatId);
+                case "/semi-dry_red_whine", "Semi-dry red whine" ->
+                        executingGetSemiDryRedWhineLinkCommand(userChatId);
+                case "/dry_white_whine", "Dry white whine" ->
+                        executingGetDryWhiteWhineLinkCommand(userChatId);
                 case "/semi-dry_white_whine", "Semi-dry white whine" ->
                         executingGetSemiDryWhiteWhineLinkCommand(userChatId);
                 default -> processTextMessage(userChatId, textFromUSer, update);
@@ -293,7 +293,8 @@ public class TelegramBotNotificationService
     private void sendInnerMessageToChat(
             Long chatId,
             String textMessage,
-            ReplyKeyboardMarkup replyKeyboardMarkup) {
+            ReplyKeyboardMarkup replyKeyboardMarkup
+    ) {
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
         sendMessage.setText(textMessage);

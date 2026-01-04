@@ -41,10 +41,6 @@ public class OrderServiceImpl implements OrderService {
     private static final String REGULAR_EXPRESSION_SPACES = "\\s+";
     private static final String SPACE = " ";
     private static final int WORD_QUANTITY = 2;
-
-    @Value("${telegram.bot.enabled}")
-    private boolean telegramBotEnable;
-
     @Nullable
     private final NotificationService notificationService;
     private final PurchaseObjectRepository purchaseObjectRepository;
@@ -55,6 +51,8 @@ public class OrderServiceImpl implements OrderService {
     private final OrderDeliveryInformationRepository orderDeliveryInformationRepository;
     private final OrderRepository orderRepository;
     private final OrderMapper orderMapper;
+    @Value("${telegram.bot.enabled}")
+    private boolean telegramBotEnable;
 
     @Override
     @Transactional
@@ -126,7 +124,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<OrderDto> findAllByUserId(Long userId, Pageable pageable) {
-        if (!userRepository.existsById(userId)) throw new EntityNotFoundException("User not found");
+        if (!userRepository.existsById(userId))
+            throw new EntityNotFoundException("User not found");
         return orderRepository.findAllByUserId(userId, pageable).map(orderMapper::toDto).toList();
     }
 

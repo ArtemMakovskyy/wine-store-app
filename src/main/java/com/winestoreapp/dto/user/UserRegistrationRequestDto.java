@@ -1,12 +1,12 @@
 package com.winestoreapp.dto.user;
 
 import com.winestoreapp.validation.FieldMatch;
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @Data
 @FieldMatch(

@@ -3,8 +3,6 @@ package com.winestoreapp.controller;
 import com.winestoreapp.dto.review.CreateReviewDto;
 import com.winestoreapp.dto.review.ReviewWithUserDescriptionDto;
 import com.winestoreapp.service.ReviewService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @Tag(name = "Review management", description = "Endpoints to managing reviews")
 @RestController
@@ -38,7 +38,8 @@ public class ReviewController {
                      first and last name. Available for all users.""")
     @PostMapping
     public ReviewWithUserDescriptionDto addReview(
-            @RequestBody @Valid CreateReviewDto createDto) {
+            @RequestBody @Valid CreateReviewDto createDto
+    ) {
         return reviewService.addReview(createDto);
     }
 
@@ -52,7 +53,8 @@ public class ReviewController {
             @PathVariable Long wineId,
             @PageableDefault(size = 4, page = 0, sort = {"reviewDate"},
                     direction = Sort.Direction.DESC)
-            Pageable pageable) {
+            Pageable pageable
+    ) {
         return reviewService.findAllByWineId(wineId, pageable);
     }
 }
