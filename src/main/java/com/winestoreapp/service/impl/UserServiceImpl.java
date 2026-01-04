@@ -16,55 +16,59 @@ import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private static final int MINIMUM_ALLOWED_NUMBER_OF_ADMIN_USERS = 1;
+    private static final long CUSTOMER_ROLE_ID = 3L;
+
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
 
     @Override
-    public UserResponseDto register(UserRegistrationRequestDto request)
-            throws RegistrationException {
+    @Transactional
+    public UserResponseDto register(UserRegistrationRequestDto request) throws RegistrationException {
         if (userRepository.findUserByEmail(request.getEmail()).isPresent()) {
             throw new RegistrationException("Unable to complete registration.");
         }
-        User user = new User();
-        user.setEmail(request.getEmail());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setFirstName(request.getFirstName());
-        user.setLastName(request.getLastName());
-        user.setPhoneNumber(request.getPhoneNumber());
-        Role roleUser =
-                roleRepository.findById(3L).orElseThrow(
-                        () -> new EntityNotFoundException("Can't find ROLE_CUSTOMER by id"));
-        user.setRoles(Set.of(roleUser));
 
-        final User savedUser = userRepository.save(user);
-        return userMapper.toDto(savedUser);
+        Role roleCustomer = roleRepository.findById(CUSTOMER_ROLE_ID).orElseThrow(
+                () -> new EntityNotFoundException("Can't find ROLE_CUSTOMER by id " + CUSTOMER_ROLE_ID));
+
+        User user = new User(
+                request.getEmail(),
+                passwordEncoder.encode(request.getPassword()),
+                request.getFirstName(),
+                request.getLastName(),
+                request.getPhoneNumber(),
+                Set.of(roleCustomer)
+        );
+
+        return userMapper.toDto(userRepository.save(user));
     }
 
     @Override
-    public UserResponseDto updateRole(Long userId, String role) {
-        final User userFromDb = userRepository.findById(userId).orElseThrow(
+    @Transactional
+    public UserResponseDto updateRole(Long userId, String roleNameStr) {
+        User userFromDb = userRepository.findById(userId).orElseThrow(
                 () -> new EntityNotFoundException("Can't find user by id " + userId));
-        final Role roleFromDb = roleRepository.findByName(RoleName.valueOf(role)).orElseThrow(
-                () -> new EntityNotFoundException("Can't find role " + role));
-        final List<Role> currentUserFromDatabaseWithAdminRoleListThatWillChange
-                = userFromDb.getRoles().stream()
-                .filter(r -> r.getName().equals(RoleName.ROLE_ADMIN))
-                .toList();
-        final List<User> usersByRoleAdminInDb = userRepository.findUsersByRole(RoleName.ROLE_ADMIN);
-        if (!currentUserFromDatabaseWithAdminRoleListThatWillChange.isEmpty()
-                && usersByRoleAdminInDb.size() == MINIMUM_ALLOWED_NUMBER_OF_ADMIN_USERS) {
-            throw new RegistrationException("You cannot change the last admin role in the "
-                    + "database. After the change, at least one user with the admin role "
-                    + "has to remain.");
+
+        Role roleFromDb = roleRepository.findByName(RoleName.valueOf(roleNameStr)).orElseThrow(
+                () -> new EntityNotFoundException("Can't find role " + roleNameStr));
+
+        // Використання доменного методу hasRole
+        if (userFromDb.hasRole(RoleName.ROLE_ADMIN)) {
+            List<User> adminsInDb = userRepository.findUsersByRole(RoleName.ROLE_ADMIN);
+            if (adminsInDb.size() <= MINIMUM_ALLOWED_NUMBER_OF_ADMIN_USERS) {
+                throw new RegistrationException("You cannot change the last admin role.");
+            }
         }
-        userFromDb.setRoles(Set.of(roleFromDb));
+
+        userFromDb.updateRoles(Set.of(roleFromDb));
         return userMapper.toDto(userRepository.save(userFromDb));
     }
 }

@@ -11,7 +11,6 @@ import com.winestoreapp.exception.EntityNotFoundException;
 import com.winestoreapp.exception.RegistrationException;
 import com.winestoreapp.model.Order;
 import com.winestoreapp.model.OrderDeliveryInformation;
-import com.winestoreapp.model.OrderPaymentStatus;
 import com.winestoreapp.model.PurchaseObject;
 import com.winestoreapp.model.ShoppingCard;
 import com.winestoreapp.model.User;
@@ -25,15 +24,10 @@ import com.winestoreapp.repository.WineRepository;
 import com.winestoreapp.service.NotificationService;
 import com.winestoreapp.service.OrderService;
 import jakarta.transaction.Transactional;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
-import java.util.Random;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.lang.Nullable;
@@ -44,15 +38,13 @@ import org.springframework.stereotype.Service;
 public class OrderServiceImpl implements OrderService {
     private static final int USER_FIRST_NAME_INDEX = 0;
     private static final int USER_LAST_NAME_INDEX = 1;
-    private static final String ORDER_IDENTIFIER = "ORDER_";
     private static final String REGULAR_EXPRESSION_SPACES = "\\s+";
     private static final String SPACE = " ";
-    private static final int NUMBER_RANDOM_CHARACTERS = 3;
-    private static final int NUMBER_OF_LETTERS_IN_THE_ENGLISH_ALPHABET = 26;
     private static final int WORD_QUANTITY = 2;
+
     @Value("${telegram.bot.enabled}")
     private boolean telegramBotEnable;
-    @Autowired(required = false)
+
     @Nullable
     private final NotificationService notificationService;
     private final PurchaseObjectRepository purchaseObjectRepository;
@@ -67,168 +59,148 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public OrderDto createOrder(CreateOrderDto dto) {
-        final String[] userFirstAndLastName
-                = dto.getUserFirstAndLastName()
-                .strip()
-                .replaceAll(REGULAR_EXPRESSION_SPACES, SPACE)
-                .split(SPACE);
-        if (userFirstAndLastName.length != WORD_QUANTITY) {
-            throw new RegistrationException(
-                    "You should enter your first and last name with a space between them");
-        }
-        for (CreatePurchaseObjectDto wine : dto.getCreateShoppingCardDto().getPurchaseObjects()) {
-            if (wineRepository.findById(wine.getWineId()).isEmpty()) {
-                throw new EntityNotFoundException("Can't find wine by id " + wine.getWineId());
-            }
-        }
+        String[] nameParts = validateAndParseName(dto.getUserFirstAndLastName());
+        validateWinesExist(dto.getCreateShoppingCardDto());
+
+        User user = findOrUpdateOrSaveUser(nameParts[USER_FIRST_NAME_INDEX],
+                nameParts[USER_LAST_NAME_INDEX],
+                dto.getPhoneNumber(), dto.getEmail());
+
+        // 1. Створюємо та ініціалізуємо замовлення (Domain Method)
         Order order = new Order();
-        order.setUser(findOrUpdateOrSaveUser(
-                userFirstAndLastName[USER_FIRST_NAME_INDEX],
-                userFirstAndLastName[USER_LAST_NAME_INDEX],
-                dto.getPhoneNumber(),
-                dto.getEmail()));
-        order.setRegistrationTime(LocalDateTime.now());
-        order.setPaymentStatus(OrderPaymentStatus.PENDING);
+        order.initializeNewOrder(user);
         order = orderRepository.save(order);
-        order.setOrderNumber(generateRandomLetters(order.getId()));
-        order.setDeliveryInformation(createOrderDeliveryInformation(
-                dto.getCreateOrderDeliveryInformationDto(), order));
-        order.setShoppingCard(createShoppingCard(
-                dto.getCreateShoppingCardDto(), order));
-        if (telegramBotEnable) {
-            notificationService.sendNotification(
-                    "Your order: " + order.getOrderNumber()
-                            + " is created.", order.getUser().getTelegramChatId());
-        }
+
+        // 2. Генерируємо номер (Domain Method)
+        order.generateAndSetOrderNumber();
+
+        // 3. Створюємо пов'язані сутності через приватні методи
+        OrderDeliveryInformation delivery = createOrderDeliveryInformation(dto.getCreateOrderDeliveryInformationDto(), order);
+        ShoppingCard card = createShoppingCard(dto.getCreateShoppingCardDto(), order);
+
+        order.setDeliveryInformation(delivery);
+        order.setShoppingCard(card);
+
+        // Зберігаємо фінальний стан
+        orderRepository.save(order);
+
+        sendNotification(order, " is created.");
         return orderMapper.toDto(order);
-    }
-
-    @Override
-    public OrderDto getById(Long id) {
-        final Order order = orderRepository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException("Can't find Order by id: " + id));
-        return orderMapper.toDto(order);
-    }
-
-    @Override
-    public boolean deleteById(Long id) {
-        final Optional<Order> optionalOrderById = orderRepository.findById(id);
-        if (optionalOrderById.isPresent()) {
-            Order order = optionalOrderById.get();
-
-            orderRepository.deleteById(id);
-
-            if (telegramBotEnable) {
-                notificationService.sendNotification(
-                        "Your order: " + order.getOrderNumber() + " has been deleted.",
-                        order.getUser().getTelegramChatId());
-            }
-            return true;
-        }
-        throw new EntityNotFoundException("Can't find Order by id: " + id);
     }
 
     @Override
     @Transactional
     public boolean updateOrderPaymentStatusAsPaidAndAddCurrentData(Long orderId) {
-        final Optional<Order> optionalOrderById = orderRepository.findById(orderId);
-        if (optionalOrderById.isPresent()) {
-            Order order = optionalOrderById.get();
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new EntityNotFoundException("Can't find order by id: " + orderId));
 
-            orderRepository.updateOrderPaymentStatusAsPaidAndSetCurrentDate(orderId);
+        // Використовуємо логіку з моделі (Domain Method)
+        order.markAsPaid();
+        orderRepository.save(order);
 
-            if (telegramBotEnable) {
-                notificationService.sendNotification(
-                        "Your order: " + order.getOrderNumber() + " has been paid",
-                        order.getUser().getTelegramChatId());
-            }
-            return true;
-        }
-        throw new EntityNotFoundException("Can't find order by id: " + orderId);
+        sendNotification(order, " has been paid");
+        return true;
+    }
+
+    @Override
+    @Transactional
+    public boolean deleteById(Long id) {
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Can't find Order by id: " + id));
+
+        orderRepository.deleteById(id);
+        sendNotification(order, " has been deleted.");
+        return true;
+    }
+
+    @Override
+    public OrderDto getById(Long id) {
+        return orderRepository.findById(id).map(orderMapper::toDto)
+                .orElseThrow(() -> new EntityNotFoundException("Can't find Order by id: " + id));
     }
 
     @Override
     public List<OrderDto> findAll(Pageable pageable) {
-        return orderRepository.findAll(pageable).stream()
-                .map(orderMapper::toDto)
-                .toList();
+        return orderRepository.findAll(pageable).stream().map(orderMapper::toDto).toList();
     }
 
     @Override
     public List<OrderDto> findAllByUserId(Long userId, Pageable pageable) {
-        if (userRepository.existsById(userId)) {
-            return orderRepository.findAllByUserId(userId, pageable)
-                    .map(orderMapper::toDto)
-                    .toList();
-        }
-        throw new EntityNotFoundException("Can't find user by id " + userId);
+        if (!userRepository.existsById(userId)) throw new EntityNotFoundException("User not found");
+        return orderRepository.findAllByUserId(userId, pageable).map(orderMapper::toDto).toList();
     }
 
-    private String generateRandomLetters(Long orderId) {
-        Random random = new Random();
-        StringBuilder result = new StringBuilder(ORDER_IDENTIFIER);
-        for (int i = 0; i < NUMBER_RANDOM_CHARACTERS; i++) {
-            char randomLetter = (char)
-                    ('A' + random.nextInt(NUMBER_OF_LETTERS_IN_THE_ENGLISH_ALPHABET));
-            result.append(randomLetter);
-        }
-        return result.append(orderId).toString();
-    }
+    // --- Приватні методи з повною логікою ---
 
     private ShoppingCard createShoppingCard(CreateShoppingCardDto dto, Order order) {
         ShoppingCard shoppingCard = new ShoppingCard();
-        final Set<PurchaseObject> purchaseObjects
-                = createPurchaseObjectDtos(dto.getPurchaseObjects());
+        shoppingCard.setOrder(order); // Встановлюємо зв'язок з Order
+
+        Set<PurchaseObject> purchaseObjects = createPurchaseObjects(dto.getPurchaseObjects(), shoppingCard);
         shoppingCard.setPurchaseObjects(purchaseObjects);
-        final BigDecimal totalCost = purchaseObjects.stream()
-                .filter(purchaseObject -> !purchaseObject.isDeleted())
-                .map(purchaseObject -> BigDecimal.valueOf(purchaseObject.getQuantity())
-                        .multiply(purchaseObject.getPrice()))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        shoppingCard.setTotalCost(totalCost);
-        shoppingCard.setOrder(order);
+
+        // Використовуємо метод моделі для розрахунку суми
+        shoppingCard.recalculateTotal();
+
         return shoppingCardRepository.save(shoppingCard);
     }
 
-    private Set<PurchaseObject> createPurchaseObjectDtos(
-            Set<CreatePurchaseObjectDto> createPurchaseObjectDtos) {
-        Set<PurchaseObject> purchaseObjects = new HashSet<>();
-        for (CreatePurchaseObjectDto purchaseObjectDto : createPurchaseObjectDtos) {
-            PurchaseObject purchaseObject = new PurchaseObject();
-            final Wine wine = wineRepository.findById(purchaseObjectDto.getWineId()).orElseThrow(
-                    () -> new EntityNotFoundException("Can't find wine by id: "
-                            + purchaseObjectDto.getWineId()));
-            purchaseObject.setWine(wine);
-            purchaseObject.setPrice(wine.getPrice());
-            purchaseObject.setQuantity(purchaseObjectDto.getQuantity());
-            purchaseObjects.add(purchaseObjectRepository.save(purchaseObject));
+    private Set<PurchaseObject> createPurchaseObjects(Set<CreatePurchaseObjectDto> dtos, ShoppingCard card) {
+        Set<PurchaseObject> objects = new HashSet<>();
+        for (CreatePurchaseObjectDto dto : dtos) {
+            Wine wine = wineRepository.findById(dto.getWineId())
+                    .orElseThrow(() -> new EntityNotFoundException("Wine not found: " + dto.getWineId()));
+
+            PurchaseObject po = new PurchaseObject();
+            po.setWine(wine);
+            po.setPrice(wine.getPrice());
+            po.setQuantity(dto.getQuantity());
+            po.setShoppingCard(card); // Встановлюємо зв'язок з Card
+
+            objects.add(purchaseObjectRepository.save(po));
         }
-        return purchaseObjects;
+        return objects;
     }
 
-    private OrderDeliveryInformation createOrderDeliveryInformation(
-            CreateOrderDeliveryInformationDto dto, Order order) {
-        final OrderDeliveryInformation orderDeliveryInformation
-                = orderDeliveryInformationMapper.toEntity(dto);
-        orderDeliveryInformation.setOrder(order);
-        return orderDeliveryInformationRepository.save(orderDeliveryInformation);
+    private OrderDeliveryInformation createOrderDeliveryInformation(CreateOrderDeliveryInformationDto dto, Order order) {
+        OrderDeliveryInformation info = orderDeliveryInformationMapper.toEntity(dto);
+        info.linkToOrder(order);
+        return orderDeliveryInformationRepository.save(info);
     }
 
-    private User findOrUpdateOrSaveUser(
-            String userFirstName,
-            String userLastName,
-            String phoneNumber,
-            String email) {
+    private String[] validateAndParseName(String fullName) {
+        String[] parts = fullName.strip().replaceAll(REGULAR_EXPRESSION_SPACES, SPACE).split(SPACE);
+        if (parts.length != WORD_QUANTITY) {
+            throw new RegistrationException("You should enter your first and last name with a space between them");
+        }
+        return parts;
+    }
 
+    private void validateWinesExist(CreateShoppingCardDto cardDto) {
+        for (CreatePurchaseObjectDto item : cardDto.getPurchaseObjects()) {
+            if (!wineRepository.existsById(item.getWineId())) {
+                throw new EntityNotFoundException("Can't find wine by id " + item.getWineId());
+            }
+        }
+    }
+
+    private void sendNotification(Order order, String actionMessage) {
+        if (telegramBotEnable && notificationService != null) {
+            notificationService.sendNotification(
+                    "Your order: " + order.getOrderNumber() + actionMessage,
+                    order.getUser().getTelegramChatId()
+            );
+        }
+    }
+
+    private User findOrUpdateOrSaveUser(String fName, String lName, String phone, String email) {
         return userRepository.findUserByEmail(email)
-                .or(() -> userRepository.findFirstByFirstNameAndLastName(
-                        userFirstName, userLastName))
+                .or(() -> userRepository.findFirstByFirstNameAndLastName(fName, lName))
                 .map(user -> {
-                    user.setPhoneNumber(phoneNumber);
+                    user.setPhoneNumber(phone);
                     user.setEmail(email);
                     return userRepository.save(user);
                 })
-                .orElseGet(() -> userRepository.save(new User(
-                        email, userFirstName, userLastName, phoneNumber)));
+                .orElseGet(() -> userRepository.save(new User(email, fName, lName, phone)));
     }
 }

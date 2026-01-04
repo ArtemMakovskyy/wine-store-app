@@ -15,6 +15,7 @@ import com.winestoreapp.model.Wine;
 import com.winestoreapp.model.WineColor;
 import com.winestoreapp.model.WineType;
 import com.winestoreapp.repository.WineRepository;
+import com.winestoreapp.service.ImageStorageService;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
@@ -28,6 +29,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
 
 @ExtendWith(MockitoExtension.class)
 class WineServiceImplTest {
@@ -35,8 +37,41 @@ class WineServiceImplTest {
     private WineMapper wineMapper;
     @Mock
     private WineRepository wineRepository;
+    @Mock
+    private ImageStorageService imageStorageService;
     @InjectMocks
     private WineServiceImpl wineService;
+
+    @Test
+    @DisplayName("Update wine images successfully")
+    void updateImage_ValidData_ShouldReturnUpdatedWineDto() {
+        // given
+        Long wineId = 1L;
+        Wine wine = getWine();
+        MultipartFile fileA = Mockito.mock(MultipartFile.class);
+        MultipartFile fileB = Mockito.mock(MultipartFile.class);
+
+        Mockito.when(wineRepository.findById(wineId)).thenReturn(Optional.of(wine));
+        Mockito.when(fileA.getOriginalFilename()).thenReturn("testA.png");
+        Mockito.when(fileB.getOriginalFilename()).thenReturn("testB.png");
+
+        // Мокаємо збереження зображень
+        Mockito.when(imageStorageService.saveImage(any(), any(), any()))
+                .thenReturn("saved_a.png")
+                .thenReturn("saved_b.png");
+
+        Mockito.when(wineRepository.save(any())).thenReturn(wine);
+        Mockito.when(wineMapper.toDto(any())).thenReturn(getWineDto());
+
+        // when
+        WineDto result = wineService.updateImage(wineId, fileA, fileB);
+
+        // then
+        verify(imageStorageService, times(2)).deleteImage(any());
+        verify(imageStorageService, times(2)).saveImage(any(), any(), any());
+        verify(wineRepository).save(wine);
+        assertEquals(getWineDto(), result);
+    }
 
     @Test
     @DisplayName("Add wine by valid wine and return WineDto")

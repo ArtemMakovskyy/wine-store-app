@@ -1,0 +1,26 @@
+### Health Check
+GET http://localhost:8080/api/health
+
+### Login як ADMIN (щоб отримати токен)
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin12345@gmail.com",
+  "password": "12345"
+}
+
+> {%
+    client.global.set("auth_token", response.body.token);
+%}
+
+### Login як MANAGER
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "manager12345@gmail.com",
+  "password": "12345"
+}
+
+> {% client.global.set("auth_token", response.body.token); %}

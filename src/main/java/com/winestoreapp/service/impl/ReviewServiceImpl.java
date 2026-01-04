@@ -7,12 +7,12 @@ import com.winestoreapp.exception.EmptyDataException;
 import com.winestoreapp.exception.RegistrationException;
 import com.winestoreapp.model.Review;
 import com.winestoreapp.model.User;
+import com.winestoreapp.model.Wine;
 import com.winestoreapp.repository.ReviewRepository;
 import com.winestoreapp.repository.UserRepository;
 import com.winestoreapp.repository.WineRepository;
 import com.winestoreapp.service.ReviewService;
 import jakarta.transaction.Transactional;
-import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,74 +24,54 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Slf4j
 public class ReviewServiceImpl implements ReviewService {
-    private static final int USER_FIRST_NAME_INDEX = 0;
-    private static final int USER_LAST_NAME_INDEX = 1;
     private final ReviewRepository reviewRepository;
     private final ReviewMapper reviewMapper;
     private final UserRepository userRepository;
     private final WineRepository wineRepository;
+
     @Value("${limiter.number.of.recorded.ratings}")
-    private int limiterOnTheNumberOfRecordedRatings;
+    private int limiter;
 
     @Override
     @Transactional
-    public ReviewWithUserDescriptionDto addReview(CreateReviewDto createDto) {
-        final String[] userFirstAndLastName
-                = createDto.getUserFirstAndLastName()
-                .strip()
-                .split("\\s+");
-        if (userFirstAndLastName.length != 2) {
-            throw new RegistrationException(
-                    "You should enter your first and last name with a space between them");
-        }
-        User user = userRepository.findFirstByFirstNameAndLastName(
-                userFirstAndLastName[USER_FIRST_NAME_INDEX],
-                userFirstAndLastName[USER_LAST_NAME_INDEX]
-        ).orElseGet(() -> userRepository.save(new User(
-                userFirstAndLastName[USER_FIRST_NAME_INDEX],
-                userFirstAndLastName[USER_LAST_NAME_INDEX]
-        )));
-
-        if (removeOutdatedReviews(createDto.getWineId(), user.getId())) {
-            log.info("into Outdated reviews were deleted");
+    public ReviewWithUserDescriptionDto addReview(CreateReviewDto dto) {
+        String[] nameParts = dto.getUserFirstAndLastName().strip().split("\\s+");
+        if (nameParts.length != 2) {
+            throw new RegistrationException("Enter first and last name with a space.");
         }
 
-        Review review = new Review();
-        review.setReviewDate(LocalDateTime.now());
-        review.setUser(user);
-        review.setMessage(createDto.getMessage());
-        review.setWine(wineRepository.findById(createDto.getWineId()).orElseThrow(
-                () -> new EmptyDataException("Can't get wine by id " + createDto.getWineId())));
-        review.setRating(createDto.getRating());
-        final Review savedReview = reviewRepository.save(review);
-        calculateWineAverageRatingScoreThenSave(createDto.getWineId());
-        return reviewMapper.toUserDescriptionDto(savedReview);
+        User user = userRepository.findFirstByFirstNameAndLastName(nameParts[0], nameParts[1])
+                .orElseGet(() -> userRepository.save(new User(nameParts[0], nameParts[1])));
+
+        removeOutdatedReviews(dto.getWineId(), user.getId());
+
+        Wine wine = wineRepository.findById(dto.getWineId())
+                .orElseThrow(() -> new EmptyDataException("Wine not found"));
+
+        Review review = new Review(user, wine, dto.getMessage(), dto.getRating());
+        Review saved = reviewRepository.save(review);
+
+        calculateWineAverageRatingScoreThenSave(dto.getWineId());
+        return reviewMapper.toUserDescriptionDto(saved);
     }
 
     @Override
     public List<ReviewWithUserDescriptionDto> findAllByWineId(Long wineId, Pageable pageable) {
         return reviewRepository.findAllByWineIdOrderByIdDesc(wineId, pageable).stream()
-                .map(reviewMapper::toUserDescriptionDto)
-                .toList();
+                .map(reviewMapper::toUserDescriptionDto).toList();
     }
 
-    private boolean removeOutdatedReviews(Long wineId, Long userId) {
-        final List<Review> reviews
-                = reviewRepository.findAllByWineIdAndUserId(
-                wineId, userId);
-        if (!reviews.isEmpty()) {
-            reviews.forEach(review -> reviewRepository.deleteById(review.getId()));
-        }
-        return true;
+    private void removeOutdatedReviews(Long wineId, Long userId) {
+        reviewRepository.findAllByWineIdAndUserId(wineId, userId)
+                .forEach(r -> reviewRepository.deleteById(r.getId()));
     }
 
     private void calculateWineAverageRatingScoreThenSave(Long wineId) {
-        final List<Review> allByWineId = reviewRepository.findAllByWineId(wineId);
-        if (allByWineId.size() > limiterOnTheNumberOfRecordedRatings) {
+        List<Review> reviews = reviewRepository.findAllByWineId(wineId);
+        if (reviews.size() > limiter) {
             reviewRepository.deleteById(reviewRepository.findMinIdByWineId(wineId));
         }
-        double averageRatingByWineId = reviewRepository.findAverageRatingByWineId(wineId)
-                + ((double) allByWineId.size() / limiterOnTheNumberOfRecordedRatings);
-        wineRepository.updateAverageRatingScore(wineId, averageRatingByWineId);
+        double avg = reviewRepository.findAverageRatingByWineId(wineId) + ((double) reviews.size() / limiter);
+        wineRepository.updateAverageRatingScore(wineId, avg);
     }
 }

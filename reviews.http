@@ -1,0 +1,14 @@
+### Add Review to Wine
+POST http://localhost:8080/api/reviews
+Content-Type: application/json
+
+{
+  "wineId": 1,
+  "firstName": "Ivan",
+  "lastName": "Ivanov",
+  "text": "Чудове вино, дуже сподобався аромат!",
+  "rating": 5
+}
+
+### Get Reviews for Wine
+GET http://localhost:8080/api/reviews/wines/1?size=4&page=0

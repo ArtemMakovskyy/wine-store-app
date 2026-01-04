@@ -169,46 +169,30 @@ public class TelegramBotNotificationService
 
     private void userRegisterByOrderNumber(Long chatId, String orderNumber) {
         log.info("Process telegram user registration");
-        final Optional<Order> orderByOrderNumber
-                = orderRepository.findOrderByOrderNumber(orderNumber);
+        Optional<Order> orderByOrderNumber = orderRepository.findOrderByOrderNumber(orderNumber);
+
         if (orderByOrderNumber.isEmpty()) {
-            sendInnerMessageToChat(chatId, "You are wrong order number: " + orderNumber
-                    + ". Please enter the correct order number, or you can ask, or "
-                    + "use the menu.", getMainButtons());
-            log.info("Wrong order number was entered in telegram bot" + orderNumber);
+            sendInnerMessageToChat(chatId, "Wrong order number.", getMainButtons());
+            return;
+        }
+
+        User userFromOrder = orderByOrderNumber.get().getUser();
+        Optional<User> userByChatId = userRepository.findUserByTelegramChatId(chatId);
+
+        if (userByChatId.isEmpty()) {
+            userFromOrder.registerTelegramChat(chatId);
+            userRepository.save(userFromOrder);
+            sendInnerMessageToChat(chatId, "Congratulations you are registered!", getMainButtons());
+        } else if (!userByChatId.get().isSameUser(userFromOrder)) {
+            User oldUser = userByChatId.get();
+            oldUser.unlinkTelegramChat();
+            userRepository.save(oldUser);
+
+            userFromOrder.registerTelegramChat(chatId);
+            userRepository.save(userFromOrder);
+            sendInnerMessageToChat(chatId, "Your telegram chat has been relinked.", getMainButtons());
         } else {
-            log.info("Correct order number was entered in telegram bot: " + orderNumber);
-            final User userFromOrder = orderByOrderNumber.orElseThrow(
-                    () -> new EntityNotFoundException("Can't get order from order number: "
-                            + orderNumber)).getUser();
-            final Optional<User> userByTelegramChatId
-                    = userRepository.findUserByTelegramChatId(chatId);
-            if (userByTelegramChatId.isEmpty()) {
-                userFromOrder.setTelegramChatId(chatId);
-                userRepository.save(userFromOrder);
-                sendInnerMessageToChat(chatId,
-                        "Congratulations you are registered!", getMainButtons());
-                log.info("No ID match was found in the database. Chat id " + chatId
-                        + ", was added to user with id:"
-                        + userFromOrder.getId());
-            } else if (userByTelegramChatId.get().getId() != userFromOrder.getId()) {
-                final User userByTelegramId = userByTelegramChatId.orElseThrow(
-                        () -> new EntityNotFoundException("Can't find user by id: "
-                                + userByTelegramChatId.get().getId()));
-                userByTelegramId.setTelegramChatId(null);
-                userRepository.save(userByTelegramId);
-                userFromOrder.setTelegramChatId(chatId);
-                userRepository.save(userFromOrder);
-                sendInnerMessageToChat(chatId,
-                        "Your telegram chat has been relinked to the current user.",
-                        getMainButtons());
-                log.info("Telegram ID was found from another user with id "
-                        + userByTelegramId.getId()
-                        + ". The Telegram ID has been transferred to the current user with "
-                        + "id " + userFromOrder.getId() + ".");
-            }
-            sendInnerMessageToChat(chatId,
-                    "You are already registered!", getMainButtons());
+            sendInnerMessageToChat(chatId, "You are already registered!", getMainButtons());
         }
     }
 

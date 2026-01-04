@@ -1,0 +1,8 @@
+### Update User Role
+PUT http://localhost:8080/api/users/1/role
+Authorization: Bearer {{auth_token}}
+Content-Type: application/json
+
+{
+  "role": "ROLE_MANAGER"
+}

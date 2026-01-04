@@ -1,0 +1,30 @@
+### Create New Order
+POST http://localhost:8080/api/orders
+Content-Type: application/json
+
+{
+  "firstName": "Ivan",
+  "lastName": "Ivanov",
+  "phoneNumber": "+380991234567",
+  "wineIds": [1, 2, 3]
+}
+
+### Get All Orders
+GET http://localhost:8080/api/orders?page=0&size=20
+Authorization: Bearer {{auth_token}}
+
+### Get Orders by User ID
+GET http://localhost:8080/api/orders/users/1
+Authorization: Bearer {{auth_token}}
+
+### Get Order by ID
+GET http://localhost:8080/api/orders/1
+Authorization: Bearer {{auth_token}}
+
+### Set Status PAID (MANAGER only)
+PATCH http://localhost:8080/api/orders/1/paid
+Authorization: Bearer {{auth_token}}
+
+### Delete Order (MANAGER only)
+DELETE http://localhost:8080/api/orders/1
+Authorization: Bearer {{auth_token}}
